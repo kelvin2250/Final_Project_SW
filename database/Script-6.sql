@@ -1,0 +1,203 @@
+CREATE TABLE BENHNHAN (
+    MaBenhNhan INT PRIMARY KEY AUTO_INCREMENT,
+    HoTen VARCHAR(100),
+    GioiTinh ENUM('Nam', 'Nu'),
+    NamSinh INT,
+    DiaChi TEXT,
+    SoDienThoai VARCHAR(15),
+    NgayKham DATE,
+    MaTinh INT,
+    MaQuan INT,
+    MaNgheNghiep INT,
+    NgayTao DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (MaTinh) REFERENCES TINH(MaTinh),
+    FOREIGN KEY (MaQuan) REFERENCES QUAN(MaQuan),
+    FOREIGN KEY (MaNgheNghiep) REFERENCES NGHENGHIEP(MaNgheNghiep)
+);
+
+CREATE TABLE TINH (
+    MaTinh INT PRIMARY KEY AUTO_INCREMENT,
+    TenTinh VARCHAR(100)
+);
+
+CREATE TABLE QUAN (
+    MaQuan INT PRIMARY KEY AUTO_INCREMENT,
+    MaTinh INT,
+    TenQuan VARCHAR(100),
+    FOREIGN KEY (MaTinh) REFERENCES TINH(MaTinh)
+);
+
+CREATE TABLE NGHENGHIEP (
+    MaNgheNghiep INT PRIMARY KEY AUTO_INCREMENT,
+    TenNgheNghiep VARCHAR(100)
+);
+
+-- Bảng nhóm thuốc (có thể dùng khi cần phân nhóm chuẩn hóa)
+CREATE TABLE NHOMTHUOC (
+    MaNhomThuoc INT PRIMARY KEY AUTO_INCREMENT,
+    TenNhomThuoc VARCHAR(100),
+    MoTaNhomThuoc TEXT
+);
+
+-- Bảng thuốc
+CREATE TABLE THUOC (
+    MaThuoc INT PRIMARY KEY AUTO_INCREMENT,
+    TenThuoc VARCHAR(100),
+    DonViTinh VARCHAR(20),
+    GiaBan DECIMAL(10,2),
+    TonKho INT,
+    CachDung TEXT,
+    SoDangKy VARCHAR(50),
+    MaNhomThuoc INT,
+    NgayTao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (MaNhomThuoc) REFERENCES NHOMTHUOC(MaNhomThuoc)
+);
+
+CREATE TABLE NHOMDVDT (
+    MaNhomDVDT INT PRIMARY KEY AUTO_INCREMENT,
+    TenNhomDVDT VARCHAR(100),
+    GhiChu TEXT
+);
+
+CREATE TABLE DVDT (
+    MaDVDT INT PRIMARY KEY AUTO_INCREMENT,
+    TenDVDT VARCHAR(100),
+    DonViTinh VARCHAR(20),
+    DonGia DECIMAL(10,2),
+    MoTa TEXT,
+    MaNhomDVDT INT,
+    NgayTao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (MaNhomDVDT) REFERENCES NHOMDVDT(MaNhomDVDT)
+);
+
+CREATE TABLE PHIEUKHAM (
+    MaPhieuKham INT PRIMARY KEY AUTO_INCREMENT,
+    MaBenhNhan INT,
+    ChanDoan TEXT,
+    NgayLap DATE,
+    NguoiLap VARCHAR(100),
+    GhiChu TEXT,
+    TaiKham DATE,
+    TrangThai VARCHAR(50),
+    FOREIGN KEY (MaBenhNhan) REFERENCES BENHNHAN(MaBenhNhan)
+);
+
+
+CREATE TABLE CT_THUOC (
+    MaCTThuoc INT PRIMARY KEY AUTO_INCREMENT,
+    MaPhieuKham INT,
+    MaThuoc INT,
+    SoLuong INT,
+    CachDung TEXT,
+    FOREIGN KEY (MaPhieuKham) REFERENCES PHIEUKHAM(MaPhieuKham),
+    FOREIGN KEY (MaThuoc) REFERENCES THUOC(MaThuoc)
+);
+
+CREATE TABLE CT_DVDT (
+    MaCTDVDT INT PRIMARY KEY AUTO_INCREMENT,
+    MaPhieuKham INT,
+    MaDVDT INT,
+    GhiChu TEXT,
+    FOREIGN KEY (MaPhieuKham) REFERENCES PHIEUKHAM(MaPhieuKham),
+    FOREIGN KEY (MaDVDT) REFERENCES DVDT(MaDVDT)
+);
+
+CREATE TABLE PHIEUNHAP (
+    MaPhieuNhap INT PRIMARY KEY AUTO_INCREMENT,
+    NhaCungCap VARCHAR(100),
+    NgayNhap DATE,
+    NguoiLap VARCHAR(100),
+    GhiChu TEXT,
+    NgayTao DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE CT_PHIEUNHAP (
+    MaCTPhieuNhap INT PRIMARY KEY AUTO_INCREMENT,
+    MaPhieuNhap INT,
+    MaThuoc INT,
+    SoLuongNhap INT,
+    GiaNhap DECIMAL(10,2),
+    GiaBan DECIMAL(10,2),
+    HanSuDung DATE,
+    FOREIGN KEY (MaPhieuNhap) REFERENCES PHIEUNHAP(MaPhieuNhap),
+    FOREIGN KEY (MaThuoc) REFERENCES THUOC(MaThuoc)
+);
+
+CREATE TABLE PHIEUXUAT (
+    MaPhieuXuat INT PRIMARY KEY AUTO_INCREMENT,
+    NgayXuat DATE,
+    NguoiLap VARCHAR(100),
+    GhiChu TEXT,
+    NgayTao DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE CT_PHIEUXUAT (
+    MaCTPhieuXuat INT PRIMARY KEY AUTO_INCREMENT,
+    MaPhieuXuat INT,
+    MaThuoc INT,
+    SoLuongXuat INT,
+    GiaBan DECIMAL(10,2),
+    FOREIGN KEY (MaPhieuXuat) REFERENCES PHIEUXUAT(MaPhieuXuat),
+    FOREIGN KEY (MaThuoc) REFERENCES THUOC(MaThuoc)
+);
+
+CREATE TABLE HOADON (
+    MaHoaDon INT PRIMARY KEY AUTO_INCREMENT,
+    MaBenhNhan INT,
+    NgayLap DATE,
+    TongTienThuoc DECIMAL(12,2),
+    TongTienDichVu DECIMAL(12,2),
+    TongTienThanhToan DECIMAL(12,2),
+    NguoiLap VARCHAR(100),
+    GhiChu TEXT,
+    NgayTao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (MaBenhNhan) REFERENCES BENHNHAN(MaBenhNhan)
+);
+
+CREATE TABLE CT_HOADON_THUOC (
+    MaCTHoaDonThuoc INT PRIMARY KEY AUTO_INCREMENT,
+    MaHoaDon INT,
+    MaThuoc INT,
+    SoLuongBan INT,
+    GiaBan DECIMAL(10,2),
+    ThanhTienThuoc DECIMAL(12,2),
+    FOREIGN KEY (MaHoaDon) REFERENCES HOADON(MaHoaDon),
+    FOREIGN KEY (MaThuoc) REFERENCES THUOC(MaThuoc)
+);
+
+CREATE TABLE CT_HOADON_DVDT (
+    MaCTHoaDonDVDT INT PRIMARY KEY AUTO_INCREMENT,
+    MaHoaDon INT,
+    MaDVDT INT,
+    GiaDichVu DECIMAL(10,2),
+    ThanhTienDichVu DECIMAL(12,2),
+    FOREIGN KEY (MaHoaDon) REFERENCES HOADON(MaHoaDon),
+    FOREIGN KEY (MaDVDT) REFERENCES DVDT(MaDVDT)
+);
+
+-- 4.1.8 Báo cáo doanh thu theo tháng
+
+CREATE TABLE BAOCAO (
+    MaBaoCao INT PRIMARY KEY AUTO_INCREMENT,
+    LoaiBaoCao VARCHAR(100),
+    ThoiGianBaoCao DATE,
+    NguoiLap VARCHAR(100),
+    GhiChu TEXT,
+    NgayTao DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE CT_BAOCAO (
+    MaCTBaoCao INT PRIMARY KEY AUTO_INCREMENT,
+    MaBaoCao INT,
+    TongSoBenhNhan INT,
+    TongThuocBanRa INT,
+    TongTienThuoc DECIMAL(12,2),
+    TongTienDichVu DECIMAL(12,2),
+    TongDoanhThu DECIMAL(12,2),
+    FOREIGN KEY (MaBaoCao) REFERENCES BAOCAO(MaBaoCao)
+);
+
+
+
+
