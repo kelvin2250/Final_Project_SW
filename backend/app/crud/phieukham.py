@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload
-from app.models import PhieuKham, CT_Thuoc, CT_DVDT, Thuoc
+from app.models import PhieuKham, CT_Thuoc, CT_DVDT, Thuoc, DVDT
 from app.schemas import PhieuKhamCreate
 from typing import List
 
@@ -73,3 +73,27 @@ def get_thuoc_by_phieu_kham(db: Session, ma_phieu_kham: int):
     ]
 
 
+def get_dvdt_by_phieu_kham(db: Session, ma_phieu_kham: int):
+    results = (
+        db.query(
+            CT_DVDT.MaDVDT,
+            CT_DVDT.GhiChu,
+            DVDT.TenDVDT,
+            DVDT.DonViTinh,
+            DVDT.DonGia,
+        )
+        .join(DVDT, CT_DVDT.MaDVDT == DVDT.MaDVDT)
+        .filter(CT_DVDT.MaPhieuKham == ma_phieu_kham)
+        .all()
+    )
+
+    return [
+        {
+            "MaDVDT": row.MaDVDT,
+            "TenDVDT": row.TenDVDT,
+            "DonViTinh": row.DonViTinh,
+            "GiaDichVu": row.DonGia,
+            "GhiChu": row.GhiChu,
+        }
+        for row in results
+    ]

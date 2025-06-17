@@ -206,12 +206,18 @@ class CTPhieuXuatOut(CTPhieuXuatBase):
         orm_mode = True
 class HoaDonBase(BaseModel):
     MaBenhNhan: int
+    MaPhieuKham: Optional[int]
     NgayLap: Optional[date]
     TongTienThuoc: Optional[float]
     TongTienDichVu: Optional[float]
     TongTienThanhToan: Optional[float]
+    TrangThai: Optional[str] = "Chưa thanh toán"
     NguoiLap: Optional[str]
     GhiChu: Optional[str]
+
+class HoaDonCreate(HoaDonBase):
+    thuocs: list[CTThuocOut]
+    dichvus: list[CTDVDTOut]
 class HoaDonOut(HoaDonBase):
     MaHoaDon: int
     NgayTao: datetime

@@ -6,6 +6,7 @@ import Patients from '../pages/Patients';
 import Prescriptions from '../pages/Prescriptions';
 import PrescriptionForm from '../components/prescriptions/PrescriptionForm'; // 👈 thêm dòng này
 import Invoices from '../pages/Invoices'
+import InvoiceForm from '../components/invoices/InvoiceForm';
 import Drugs from '../pages/Drugs';
 import Stock from '../pages/StockEntryList';
 import Reports from '../pages/Reports';
@@ -25,6 +26,8 @@ function App() {
           <Route path="/prescriptions/new/:patientId" element={<PrescriptionForm />} /> {/* 👈 Thêm route này */}
           <Route path="/prescriptions/create" element={<PrescriptionForm />} />
           <Route path="/prescriptions/create/:MaBenhNhan" element={<PrescriptionForm />} />
+          <Route path="/invoices/create/:MaPhieuKham" element={<InvoiceForm />} />
+          <Route path="/invoices/create" element={<InvoiceForm />} />
         </Routes>
       </Router>
     </div>

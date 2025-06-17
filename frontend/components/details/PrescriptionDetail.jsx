@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { FaFilePrescription } from "react-icons/fa";
 import { fetchChiTietThuoc } from "../../src/api";
-
+import { useNavigate } from "react-router-dom";
 
 
 export default function PrescriptionDetail({ data }) {
+    const navigate = useNavigate();
+    const handleMakeInvoice = () => {
+        navigate(`/invoices/create/${data.MaPhieuKham}`)
+    }
     const [medicines, setMedicines] = useState([]);
 
     if (!data) return <p>Không có đơn thuốc.</p>;
@@ -73,8 +77,7 @@ export default function PrescriptionDetail({ data }) {
             </div>
 
             <div className="flex flex-wrap gap-2">
-                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded">COPY</button>
-                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded">LẬP HÓA ĐƠN</button>
+                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded" onClick={handleMakeInvoice}>LẬP HÓA ĐƠN</button>
                 <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">THAY ĐỔI</button>
                 <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">XÓA</button>
             </div>

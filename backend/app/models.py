@@ -144,13 +144,16 @@ class HoaDon(Base):
     __tablename__ = "HOADON"
     MaHoaDon = Column(Integer, primary_key=True, autoincrement=True)
     MaBenhNhan = Column(Integer, ForeignKey("BENHNHAN.MaBenhNhan"))
+    MaPhieuKham = Column(Integer, ForeignKey("PHIEUKHAM.MaPhieuKham"))
     NgayLap = Column(Date, nullable=True)
-    TongTienThuoc = Column(Integer, nullable=True)
-    TongTienDichVu = Column(Integer, nullable=True)
-    TongTienThanhToan = Column(Integer, nullable=True)
+    TongTienThuoc = Column(Float, nullable=True)
+    TongTienDichVu = Column(Float, nullable=True)
+    TongTienThanhToan = Column(Float, nullable=True)
+    TrangThai = Column(String(50), default='Đã thanh toán')
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
     NgayTao = Column(DateTime, default=datetime.utcnow)
+
 
 class CT_HoaDonThuoc(Base):
     __tablename__ = "CT_HOADON_THUOC"
@@ -158,16 +161,18 @@ class CT_HoaDonThuoc(Base):
     MaHoaDon = Column(Integer, ForeignKey("HOADON.MaHoaDon"))
     MaThuoc = Column(Integer, ForeignKey("THUOC.MaThuoc"))
     SoLuongBan = Column(Integer, nullable=True)
-    GiaBan = Column(Integer, nullable=True)
-    ThanhTienThuoc = Column(Integer, nullable=True)
+    GiaBan = Column(Float, nullable=True)
+    ThanhTienThuoc = Column(Float, nullable=True)
+
 
 class CT_HoaDonDVDT(Base):
     __tablename__ = "CT_HOADON_DVDT"
     MaCTHoaDonDVDT = Column(Integer, primary_key=True, autoincrement=True)
     MaHoaDon = Column(Integer, ForeignKey("HOADON.MaHoaDon"))
     MaDVDT = Column(Integer, ForeignKey("DVDT.MaDVDT"))
-    GiaDichVu = Column(Integer, nullable=True)
-    ThanhTienDichVu = Column(Integer, nullable=True)
+    GiaDichVu = Column(Float, nullable=True)
+    ThanhTienDichVu = Column(Float, nullable=True)
+
 
 class BaoCao(Base):
     __tablename__ = "BAOCAO"

@@ -27,3 +27,8 @@ def get_one(id: int, db: Session = Depends(get_db)):
 def get_ctthuoc(maPK: int, db: Session = Depends(get_db)):
     return crud.get_thuoc_by_phieu_kham(db, maPK)
 
+@router.get("/{maPK}/dvdt")
+def get_ctdvdt(maPK: int, db: Session = Depends(get_db)):
+    return crud.get_dvdt_by_phieu_kham(db, maPK)
+
+

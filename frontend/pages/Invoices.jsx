@@ -2,8 +2,9 @@ import { useState } from "react";
 import FilterBar from "../components/common/FilterBar";
 import InvoiceList from "../components/invoices/InvoiceList";
 import InvoiceForm from "../components/invoices/InvoiceForm";
-
+import { useNavigate } from "react-router-dom";
 export default function InvoicesPage() {
+    const navigate = useNavigate()
     const [filters, setFilters] = useState({
         keyword: "",
         fromDate: null,
@@ -28,7 +29,7 @@ export default function InvoicesPage() {
                             <div className="flex gap-2 items-center">
                                 <button
                                     className="bg-green-700 text-white text-sm px-3 py-0.5 rounded-full whitespace-nowrap"
-                                    onClick={() => setShowForm(true)}
+                                    onClick={() => navigate("/invoices/create")}
                                 >
                                     + Thêm hóa đơn
                                 </button>
