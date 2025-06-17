@@ -43,12 +43,14 @@ const mockInvoice = {
 };
 
 export default function PrescriptionTabs({
-    prescription = mockPrescription,
-    patient = mockPatient,
-    invoice = mockInvoice
+    prescription,
+    patient,
+    invoice 
 }) {
     const [tab, setTab] = useState("prescription");
-
+    console.log("đơn thuốc: ", prescription);
+    console.log("bệnh nhân: ", patient);
+    
     return (
         <div>
             <div className="flex space-x-4 border-b mb-4 text-sm">
@@ -71,7 +73,6 @@ export default function PrescriptionTabs({
                     Thông tin hóa đơn
                 </button>
             </div>
-
             {tab === "prescription" && <PrescriptionDetail data={prescription} />}
             {tab === "patient" && <PatientDetail data={patient} />}
             {tab === "invoice" && <InvoiceDetail data={invoice} />}

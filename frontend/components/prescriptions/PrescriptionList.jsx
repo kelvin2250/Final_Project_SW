@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect } from "react";
-import { fetchPrescriptions } from "../../src/api"; // Đường dẫn đúng với file api bạn đặt
+import { fetchPrescriptions, getPatientByMaBenhNhan } from "../../src/api"; // Đường dẫn đúng với file api bạn đặt
 import PrescriptionTabs from "../tabDetail/PrescriptionTabs";
 import PrescriptionRow from "./PrescriptionRow";
 
@@ -7,6 +7,7 @@ export default function PrescriptionList({ filters }) {
     const [phieuKhams, setPhieuKhams] = useState([]);
     const [phieuChon, setPhieuChon] = useState(null);
     const { keyword = "", fromDate = null, toDate = null } = filters || {};
+    const [selectedPatient, setSelectedPatient] = useState(null);
 
     useEffect(() => {
         fetchPrescriptions().then(data => {
@@ -49,27 +50,37 @@ export default function PrescriptionList({ filters }) {
                     {filtered.map((p, index) => (
                         <Fragment key={p.MaPhieuKham}>
                             <PrescriptionRow
-                                data={p} // truyền nguyên dữ liệu gốc từ DB
+                                data={p}
                                 index={index}
                                 isSelected={phieuChon?.MaPhieuKham === p.MaPhieuKham}
-                                onClick={() =>
-                                    setPhieuChon(phieuChon?.MaPhieuKham === p.MaPhieuKham ? null : p)
-                                }
+                                onClick={async () => {
+                                    const isSelected = phieuChon?.MaPhieuKham === p.MaPhieuKham;
+                                    if (isSelected) {
+                                        setPhieuChon(null);
+                                        setSelectedPatient(null);
+                                    } else {
+                                        setPhieuChon(p);
+                                        const patient = await getPatientByMaBenhNhan(p.MaBenhNhan);
+                                        setSelectedPatient(patient);
+                                    }
+                                }}
+                                
                             />
+                            {phieuChon?.MaPhieuKham === p.MaPhieuKham && (
+                                <tr className="border-t border-gray-200">
+                                    <td colSpan="7" className="bg-gray-50 px-4 py-4">
+                                        <PrescriptionTabs
+                                            prescription={p}
+                                            patient={selectedPatient}
+                                            invoice={null}
+                                        />
+                                    </td>
+                                </tr>
+                            )}
                         </Fragment>
                     ))}
                 </tbody>
             </table>
-
-            {phieuChon && (
-                <div className="mt-6">
-                    <PrescriptionTabs
-                        prescription={phieuChon}
-                        patient={{ name: `Bệnh nhân #${phieuChon.MaBenhNhan}` }}
-                        invoice={null}
-                    />
-                </div>
-            )}
         </div>
     );
 }

@@ -1,38 +1,25 @@
-import { useEffect, useState, Fragment } from "react";
-import { fetchPatients } from "../../src/api"; // Đường dẫn đúng với file api bạn đặt
+import { Fragment, useState } from "react";
 import PatientRow from "./PatientRow";
 import PatientTabs from "../tabDetail/PatientTabs";
 
-export default function PatientList({ filters }) {
+export default function PatientList({ filters, patients, loading }) {
     const [expandedId, setExpandedId] = useState(null);
-    const [patients, setPatients] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchPatients()
-            .then((data) => {
-                console.log("✅ Dữ liệu bệnh nhân từ API:", data); // 👈 Thêm dòng này
-                setPatients(data);
-            })
-            .catch((err) => console.error(err))
-            .finally(() => setLoading(false));
-    }, []);
-    
 
     const toggleExpand = (id) => {
         setExpandedId((prev) => (prev === id ? null : id));
     };
 
+    // const {selectedPrescriptions, }
     const { keyword = "", fromDate = null, toDate = null } = filters || {};
 
     const filtered = patients.filter((p) => {
         const kw = keyword.toLowerCase();
         const matchKeyword =
-            p.HoTen.toLowerCase().includes(kw) ||
-            p.SoDienThoai.toLowerCase().includes(kw) ||
+            p.HoTen?.toLowerCase().includes(kw) ||
+            p.SoDienThoai?.toLowerCase().includes(kw) ||
             p.DiaChi?.toLowerCase().includes(kw);
 
-        const createdAtDate = new Date(p.NgayTao); // backend trả ISO 8601
+        const createdAtDate = new Date(p.NgayTao);
         const matchFrom = !fromDate || createdAtDate >= new Date(fromDate);
         const matchTo = !toDate || createdAtDate <= new Date(toDate);
 
@@ -40,7 +27,7 @@ export default function PatientList({ filters }) {
     });
 
     return loading ? (
-        <div>Đang tải danh sách bệnh nhân...</div>
+        <div className="py-6 text-center text-gray-500">Đang tải danh sách bệnh nhân...</div>
     ) : (
         <div className="mt-3">
             <table className="w-full text-sm border border-gray-300 shadow-sm">
@@ -70,8 +57,8 @@ export default function PatientList({ filters }) {
                                     <td colSpan="9" className="bg-gray-50 px-4 py-4">
                                         <PatientTabs
                                             patient={p}
-                                            prescriptions={[]} // cập nhật sau
-                                            invoices={[]} // cập nhật sau
+                                            prescriptions={[]} // TODO: fetch thực
+                                            invoices={[]} // TODO: fetch thực
                                         />
                                     </td>
                                 </tr>

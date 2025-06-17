@@ -25,8 +25,8 @@ class NgheNghiepOut(NgheNghiepBase):
 
 class BenhNhanBase(BaseModel):
     HoTen: str
-    GioiTinh: str
-    NamSinh: int
+    GioiTinh: Optional[str] = None
+    NamSinh: Optional[int] = None
     SoDienThoai: Optional[str] = None
     DiaChi: Optional[str] = None
     MaNgheNghiep: Optional[int] = None
@@ -156,8 +156,10 @@ class PhieuKhamCreate(PhieuKhamBase):
 
 class PhieuKhamOut(PhieuKhamBase):
     MaPhieuKham: int
+    benhnhan: Optional[BenhNhanOut]  
     class Config:
         orm_mode = True
+
 
 
 class PhieuNhapBase(BaseModel):

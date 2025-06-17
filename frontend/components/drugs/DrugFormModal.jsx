@@ -2,10 +2,16 @@ import { useState } from "react";
 
 export default function DrugFormModal({ isOpen, onClose, onSubmit }) {
     const [formData, setFormData] = useState({
+        MaThuoc: "",
         TenThuoc: "",
+        SoDangKy: "",
+        HoatChat: "",
         DonViTinh: "",
-        TonKho: 0,
+        NhomThuoc: "",
+        GiaNhap: 0,
         GiaBan: 0,
+        SoLuongMacDinh: 1,
+        TonToiThieu: "",
         CachDung: "",
     });
 
@@ -23,18 +29,49 @@ export default function DrugFormModal({ isOpen, onClose, onSubmit }) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-xl w-full max-w-2xl shadow-lg">
-                <h2 className="text-lg font-bold mb-4 text-purple-700">➕ Thêm thuốc mới</h2>
-                <div className="grid grid-cols-2 gap-4">
-                    <input name="TenThuoc" placeholder="Tên thuốc" className="border p-2 rounded" value={formData.TenThuoc} onChange={handleChange} />
-                    <input name="DonViTinh" placeholder="Đơn vị tính" className="border p-2 rounded" value={formData.DonViTinh} onChange={handleChange} />
-                    <input name="TonKho" type="number" placeholder="Tồn kho" className="border p-2 rounded" value={formData.TonKho} onChange={handleChange} />
-                    <input name="GiaBan" type="number" placeholder="Giá bán" className="border p-2 rounded" value={formData.GiaBan} onChange={handleChange} />
-                    <textarea name="CachDung" placeholder="Cách dùng" className="col-span-2 border p-2 rounded" value={formData.CachDung} onChange={handleChange}></textarea>
+            <div className="bg-white p-6 rounded-xl w-[60%] max-w-[850px] shadow-lg">
+                <h2 className="text-xl font-bold mb-6 text-teal-700">➕ Thêm thuốc</h2>
+
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                    {[
+                        { label: "Mã thuốc", name: "MaThuoc", type: "text" },
+                        { label: "Chọn nhóm", name: "NhomThuoc", type: "text" },
+                        { label: "Tên thuốc", name: "TenThuoc", type: "text" },
+                        { label: "Giá bán", name: "GiaBan", type: "number" },
+                        { label: "Số đăng ký", name: "SoDangKy", type: "text" },
+                        { label: "Giá nhập", name: "GiaNhap", type: "number" },
+                        { label: "SL mặc định", name: "SoLuongMacDinh", type: "number" },
+                        { label: "Đơn vị tính", name: "DonViTinh", type: "text" },
+                        { label: "Tồn tối thiểu", name: "TonToiThieu", type: "text" },
+                    ].map(({ label, name, type }) => (
+                        <div className="flex items-center" key={name}>
+                            <label className="w-20 text-sm mr-4 text-right">{label}</label>
+                            <input
+                                name={name}
+                                type={type}
+                                value={formData[name]}
+                                onChange={handleChange}
+                                className="flex-1 border p-0.5 rounded text-sm"
+                            />
+                        </div>
+                    ))}
+
+                    {/* Cách dùng - full width dòng cuối */}
+                    <div className="col-span-2 flex items-center">
+                        <label className="w-20 text-sm text-right mr-4">Cách dùng</label>
+                        <input
+                            name="CachDung"
+                            value={formData.CachDung}
+                            onChange={handleChange}
+                            className="flex-1 border rounded text-sm p-0.5"
+                        />
+                    </div>
                 </div>
-                <div className="flex justify-end gap-2 mt-4">
-                    <button className="bg-green-600 text-white px-4 py-1 rounded" onClick={handleSubmit}>Lưu</button>
-                    <button className="bg-gray-500 text-white px-4 py-1 rounded" onClick={onClose}>Huỷ</button>
+
+                {/* Buttons */}
+                <div className="flex justify-end gap-3 mt-6">
+                    <button className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition">Hoàn tất</button>
+                    <button className="bg-gray-500 text-white px-5 py-2 rounded hover:bg-gray-600 transition" onClick={onClose}>Bỏ qua</button>
                 </div>
             </div>
         </div>

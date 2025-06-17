@@ -1,13 +1,25 @@
-// 📁 src/components/details/PrescriptionDetail.jsx
+import { useEffect, useState } from "react";
 import { FaFilePrescription } from "react-icons/fa";
+import { fetchChiTietThuoc } from "../../src/api";
+
+
 
 export default function PrescriptionDetail({ data }) {
+    const [medicines, setMedicines] = useState([]);
+
     if (!data) return <p>Không có đơn thuốc.</p>;
 
-    const { diagnosis, notes, medicines = [] } = data;
+    const { MaPhieuKham, ChanDoan, GhiChu } = data;
+
+    useEffect(() => {
+        if (!MaPhieuKham) return;
+        fetchChiTietThuoc(MaPhieuKham)
+            .then(setMedicines)
+            .catch((err) => console.error("Lỗi khi load thuốc:", err));
+    }, [MaPhieuKham]);
 
     const totalQuantity = medicines.reduce(
-        (sum, med) => sum + (med.quantity || 0),
+        (sum, med) => sum + (med.SoLuong || 0),
         0
     );
 
@@ -17,7 +29,6 @@ export default function PrescriptionDetail({ data }) {
                 <FaFilePrescription /> Thông tin đơn thuốc
             </h2>
 
-            {/* Bảng thuốc */}
             <table className="w-full text-left border mb-3">
                 <thead className="bg-gray-100 text-xs uppercase">
                     <tr>
@@ -34,12 +45,12 @@ export default function PrescriptionDetail({ data }) {
                     {medicines.map((med, idx) => (
                         <tr key={idx} className="text-sm">
                             <td className="border px-2 py-1 text-center">{idx + 1}</td>
-                            <td className="border px-2 py-1">{med.code || `TH${idx + 1}`}</td>
-                            <td className="border px-2 py-1">{med.registration || "-"}</td>
-                            <td className="border px-2 py-1 font-medium">{med.name}</td>
-                            <td className="border px-2 py-1 text-center">{med.quantity}</td>
-                            <td className="border px-2 py-1">{med.unit}</td>
-                            <td className="border px-2 py-1">{med.usage}</td>
+                            <td className="border px-2 py-1">{med.MaThuoc || `TH${idx + 1}`}</td>
+                            <td className="border px-2 py-1">{med.SoDangKy || "-"}</td>
+                            <td className="border px-2 py-1 font-medium">{med.TenThuoc}</td>
+                            <td className="border px-2 py-1 text-center">{med.SoLuong}</td>
+                            <td className="border px-2 py-1">{med.DonViTinh}</td>
+                            <td className="border px-2 py-1">{med.CachDungChiTiet}</td>
                         </tr>
                     ))}
                     <tr className="font-semibold">
@@ -52,30 +63,20 @@ export default function PrescriptionDetail({ data }) {
                 </tbody>
             </table>
 
-            {/* Chẩn đoán & lời dặn */}
             <div className="mb-4">
                 <p className="mb-1">
-                    <span className="font-medium">🔎 Chẩn đoán:</span> {diagnosis || "Không có"}
+                    <span className="font-medium">🔎 Chẩn đoán:</span> {ChanDoan || "Không có"}
                 </p>
                 <p>
-                    <span className="font-medium">📝 Lời dặn:</span> {notes || "Không có"}
+                    <span className="font-medium">📝 Lời dặn:</span> {GhiChu || "Không có"}
                 </p>
             </div>
 
-            {/* Các nút chức năng */}
             <div className="flex flex-wrap gap-2">
-                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded">
-                    COPY
-                </button>
-                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded">
-                    LẬP HÓA ĐƠN
-                </button>
-                <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
-                    THAY ĐỔI
-                </button>
-                <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
-                    XÓA
-                </button>
+                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded">COPY</button>
+                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded">LẬP HÓA ĐƠN</button>
+                <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">THAY ĐỔI</button>
+                <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">XÓA</button>
             </div>
         </div>
     );

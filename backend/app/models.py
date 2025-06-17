@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, DateTime, Enum, Text, Fore
 from app.db.base import Base
 from datetime import datetime
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 class BenhNhan(Base):
     __tablename__ = "BENHNHAN"
 
@@ -58,7 +59,7 @@ class Thuoc(Base):
     CachDung = Column(Text, nullable=True)
     SoDangKy = Column(String(50), nullable=True)
     MaNhomThuoc = Column(Integer, ForeignKey("NHOMTHUOC.MaNhomThuoc"))
-    NgayTao = Column(DateTime, default=datetime.utcnow)
+    NgayTao = Column(DateTime, default=datetime.time)
 
 class NhomDVDT(Base):
     __tablename__ = "NHOMDVDT"
@@ -86,6 +87,8 @@ class PhieuKham(Base):
     GhiChu = Column(Text, nullable=True)
     TaiKham = Column(Date, nullable=True)
     TrangThai = Column(String(50), nullable=True)
+    
+    benhnhan = relationship("BenhNhan")
 
 class CT_Thuoc(Base):
     __tablename__ = "CT_THUOC"

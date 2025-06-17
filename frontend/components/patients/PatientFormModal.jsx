@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { cleanFormData } from "../../utils/cleanFormData";
 export default function PatientFormModal({ isOpen, onClose, onSubmit }) {
     const [formData, setFormData] = useState({
         HoTen: "",
@@ -24,7 +24,10 @@ export default function PatientFormModal({ isOpen, onClose, onSubmit }) {
     };
 
     const handleSubmit = () => {
-        onSubmit(formData);
+        const cleanedData = cleanFormData(formData, [
+            "NamSinh", "CanNang", "ChieuCao", "Mach", "NhietDo", "MaNgheNghiep"
+        ]);
+        onSubmit(cleanedData);
         onClose();
     };
 

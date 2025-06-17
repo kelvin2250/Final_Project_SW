@@ -27,3 +27,26 @@ export async function fetchPrescriptions() {
         return [];
     }
 }
+
+export async function fetchChiTietThuoc(maPhieuKham) {
+    try {
+        const res = await fetch(`http://localhost:8000/api/phieukham/${maPhieuKham}/thuoc`);
+        if (!res.ok) throw new Error("Lỗi khi tải chi tiết thuốc");
+        return await res.json();
+    } catch (err) {
+        console.error("❌ Lỗi fetchChiTietThuoc:", err);
+        return [];
+    }
+}
+
+export async function getPatientByMaBenhNhan(maBenhNhan) {
+    try {
+        const res = await fetch(`${API_URL}/benhnhan/${maBenhNhan}`);
+        if (!res.ok) throw new Error("Không thể lấy dữ liệu bệnh nhân");
+        return await res.json();
+    } catch (err) {
+        console.error("❌ Lỗi fetchPatiendsByMa:", err);
+        return [];
+    }
+    
+}

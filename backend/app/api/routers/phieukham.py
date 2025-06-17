@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.dependency import get_db
 import app.crud.phieukham as crud
-from app.schemas import PhieuKhamCreate, PhieuKhamOut
+from app.schemas import PhieuKhamCreate, PhieuKhamOut, CTThuocOut
 
 router = APIRouter(
     prefix="/phieukham",
@@ -14,7 +14,7 @@ def create(data: PhieuKhamCreate, db: Session = Depends(get_db)):
     return crud.create_phieukham(db, data)
 
 @router.get("/", response_model=list[PhieuKhamOut])
-def get_all(db: Session = Depends(get_db)):
+def get_all(db: Session = Depends(get_db)): 
     return crud.get_all_phieukhams(db)
 
 @router.get("/{id}", response_model=PhieuKhamOut)
@@ -23,3 +23,7 @@ def get_one(id: int, db: Session = Depends(get_db)):
     if not phieu:
         raise HTTPException(status_code=404, detail="Không tìm thấy phiếu khám")
     return phieu
+@router.get("/{maPK}/thuoc")
+def get_ctthuoc(maPK: int, db: Session = Depends(get_db)):
+    return crud.get_thuoc_by_phieu_kham(db, maPK)
+
