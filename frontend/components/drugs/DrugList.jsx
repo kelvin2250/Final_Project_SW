@@ -1,53 +1,79 @@
 import { useEffect, useState } from "react";
 import DrugRow from "./DrugRow";
-import DrugFormModal from "./DrugFormModal"; // Import modal
+import DrugFormModal from "./DrugFormModal";
 
-export default function DrugList() {
+export default function DrugList({ filters, newDrug, setNewDrug }) {
     const [drugs, setDrugs] = useState([]);
     const [groups, setGroups] = useState([]);
-    const [selectedGroup, setSelectedGroup] = useState(null); // null = tất cả
+    const [selectedGroup, setSelectedGroup] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedDrug, setSelectedDrug] = useState(null); // Để chứa dữ liệu thuốc khi chỉnh sửa
+    const [selectedDrug, setSelectedDrug] = useState(null);
 
-    // Lấy dữ liệu thuốc và nhóm thuốc từ API
+    // Lấy dữ liệu ban đầu từ API
     useEffect(() => {
         fetch("http://localhost:8000/api/thuoc")
             .then(res => res.json())
-            .then(setDrugs)
+            .then(data => {
+                console.log("Dữ liệu thuốc:", data);
+                setDrugs(data);
+            })
             .catch(console.error);
 
         fetch("http://localhost:8000/api/nhomthuoc")
             .then(res => res.json())
-            .then(setGroups)
+            .then(data => {
+                console.log("Dữ liệu nhóm thuốc:", data);
+                setGroups(data);
+            })
             .catch(console.error);
     }, []);
 
-    // Lọc thuốc theo nhóm đã chọn
-    const filteredDrugs = selectedGroup
-        ? drugs.filter(d => d.MaNhomThuoc === selectedGroup)
-        : drugs;
+    // Cập nhật danh sách thuốc khi có thuốc mới
+    useEffect(() => {
+        if (newDrug) {
+            setDrugs(prev => {
+                // Kiểm tra xem thuốc đã tồn tại chưa để tránh trùng lặp
+                if (!prev.some(drug => drug.MaThuoc === newDrug.MaThuoc)) {
+                    return [...prev, newDrug];
+                }
+                return prev;
+            });
+            setNewDrug(null); // Xóa newDrug sau khi thêm
+        }
+    }, [newDrug, setNewDrug]);
 
-    // Hàm xử lý xóa thuốc
+    // Lọc thuốc theo nhóm và bộ lọc
+    const filteredDrugs = drugs
+        .filter(d => selectedGroup ? d.MaNhomThuoc === selectedGroup : true)
+        .filter(d => {
+            if (!filters.search) return true;
+            return (
+                d.TenThuoc.toLowerCase().includes(filters.search.toLowerCase()) ||
+                d.SoDangKy.toLowerCase().includes(filters.search.toLowerCase())
+            );
+        });
+
     const handleDelete = (drugId) => {
         if (window.confirm("Bạn có chắc muốn xóa thuốc này?")) {
             fetch(`http://localhost:8000/api/thuoc/${drugId}`, {
                 method: "DELETE",
             })
                 .then(() => {
-                    // Cập nhật lại danh sách thuốc sau khi xóa
                     setDrugs(drugs.filter((drug) => drug.MaThuoc !== drugId));
                 })
                 .catch((err) => console.error("Xóa thuốc lỗi:", err));
         }
     };
 
-    // Hàm xử lý chỉnh sửa thuốc
     const handleEdit = (drug) => {
+        if (!drug) {
+            console.error("Dữ liệu thuốc không hợp lệ:", drug);
+            return;
+        }
         setIsEditing(true);
-        setSelectedDrug(drug); // Cập nhật dữ liệu thuốc đang chỉnh sửa
+        setSelectedDrug(drug);
     };
 
-    // Hàm xử lý lưu cập nhật thuốc
     const handleSave = (updatedDrug) => {
         fetch(`http://localhost:8000/api/thuoc/${updatedDrug.MaThuoc}`, {
             method: "PUT",
@@ -58,7 +84,6 @@ export default function DrugList() {
         })
             .then((res) => res.json())
             .then((data) => {
-                // Cập nhật lại danh sách thuốc sau khi chỉnh sửa
                 setDrugs(drugs.map(drug => drug.MaThuoc === data.MaThuoc ? data : drug));
                 setIsEditing(false);
                 setSelectedDrug(null);
@@ -68,7 +93,6 @@ export default function DrugList() {
 
     return (
         <div className="grid grid-cols-5 gap-6 mt-4">
-            {/* Sidebar nhóm thuốc */}
             <div className="col-span-1 bg-white rounded shadow p-4">
                 <h2 className="font-bold text-teal-700 mb-2">📂 Nhóm thuốc</h2>
                 <ul className="space-y-2 text-sm max-h-[500px] overflow-y-auto">
@@ -90,7 +114,6 @@ export default function DrugList() {
                 </ul>
             </div>
 
-            {/* Danh sách thuốc */}
             <div className="col-span-4">
                 <table className="w-full text-sm border border-gray-300 shadow-sm">
                     <thead className="bg-emerald-100 text-gray-700 text-center">
@@ -106,25 +129,33 @@ export default function DrugList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredDrugs.map((drug) => (
-                            <DrugRow
-                                key={drug.MaThuoc}
-                                data={drug}
-                                onEdit={() => handleEdit(drug)}
-                                onDelete={() => handleDelete(drug.MaThuoc)}
-                            />
-                        ))}
+                        {filteredDrugs.length > 0 ? (
+                            filteredDrugs.map((drug) => (
+                                <DrugRow
+                                    key={drug.MaThuoc}
+                                    data={drug}
+                                    onEdit={() => handleEdit(drug)}
+                                    onDelete={() => handleDelete(drug.MaThuoc)}
+                                />
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="8" className="py-2 px-2 text-center">Không có dữ liệu thuốc</td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
 
-            {/* Modal chỉnh sửa thuốc */}
             {isEditing && (
                 <DrugFormModal
                     isOpen={isEditing}
-                    onClose={() => { setIsEditing(false); setSelectedDrug(null); }}
-                    onSubmit={handleSave}  // Lưu lại sau khi chỉnh sửa
-                    initialData={selectedDrug} // Truyền dữ liệu thuốc cần sửa
+                    onClose={() => {
+                        setIsEditing(false);
+                        setSelectedDrug(null);
+                    }}
+                    onSubmit={handleSave}
+                    initialData={selectedDrug}
                 />
             )}
         </div>

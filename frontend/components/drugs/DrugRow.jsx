@@ -10,7 +10,7 @@ export default function DrugRow({ data, onEdit, onDelete }) {
             <td className="border border-gray-300">{data.CachDung}</td>
             {/* <td className="border border-gray-300">{data.NgayTao?.slice(0, 10)}</td> */}
             <td className="space-x-2 border border-gray-300">
-                <button title="Sửa" onClick={onEdit}>✏️</button>
+                <button title="Sửa" onClick={() => onEdit(data)}>✏️</button>
                 <button title="Xoá" onClick={onDelete}>🗑️</button>
             </td>
         </tr>

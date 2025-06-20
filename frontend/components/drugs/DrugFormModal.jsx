@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 export default function DrugFormModal({ isOpen, onClose, onSubmit, initialData = null }) {
     const [formData, setFormData] = useState({
+        MaThuoc: "",
         TenThuoc: "",
         DonViTinh: "",
         GiaBan: 0,
@@ -10,20 +11,20 @@ export default function DrugFormModal({ isOpen, onClose, onSubmit, initialData =
         SoDangKy: "",
         MaNhomThuoc: "",
     });
-
     const [nhomThuocList, setNhomThuocList] = useState([]);
 
-    // Gọi API lấy danh sách nhóm thuốc
     useEffect(() => {
         fetch("http://localhost:8000/api/nhomthuoc")
             .then((res) => res.json())
             .then((data) => {
+                console.log("Dữ liệu nhóm thuốc trong modal:", data);
                 setNhomThuocList(data);
             })
             .catch((err) => console.error("Lỗi khi lấy nhóm thuốc:", err));
 
         if (initialData) {
             setFormData({
+                MaThuoc: initialData.MaThuoc ?? "",
                 TenThuoc: initialData.TenThuoc ?? "",
                 DonViTinh: initialData.DonViTinh ?? "",
                 GiaBan: initialData.GiaBan ?? 0,
@@ -32,18 +33,33 @@ export default function DrugFormModal({ isOpen, onClose, onSubmit, initialData =
                 SoDangKy: initialData.SoDangKy ?? "",
                 MaNhomThuoc: initialData.MaNhomThuoc ?? "",
             });
+            return;
         }
+        setFormData({
+            MaThuoc: "",
+            TenThuoc: "",
+            DonViTinh: "",
+            GiaBan: 0,
+            TonKho: 0,
+            CachDung: "",
+            SoDangKy: "",
+            MaNhomThuoc: "",
+        });
     }, [initialData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: name === "GiaBan" || name === "TonKho" ? Number(value) : value,
         }));
     };
 
     const handleSubmit = () => {
+        if (!formData.TenThuoc || !formData.MaNhomThuoc) {
+            alert("Vui lòng điền đầy đủ Tên thuốc và Nhóm thuốc");
+            return;
+        }
         onSubmit(formData);
         onClose();
     };
@@ -76,12 +92,11 @@ export default function DrugFormModal({ isOpen, onClose, onSubmit, initialData =
                         </div>
                     ))}
 
-                    {/* Input giá bán và tồn kho (type text) */}
                     <div className="flex items-center">
                         <label className="w-32 text-sm mr-4 text-right">Giá bán</label>
                         <input
                             name="GiaBan"
-                            type="text"
+                            type="number"
                             value={formData.GiaBan}
                             onChange={handleChange}
                             className="flex-1 border p-0.5 rounded text-sm"
@@ -92,7 +107,7 @@ export default function DrugFormModal({ isOpen, onClose, onSubmit, initialData =
                         <label className="w-32 text-sm mr-4 text-right">Tồn kho</label>
                         <input
                             name="TonKho"
-                            type="text"
+                            type="number"
                             value={formData.TonKho}
                             onChange={handleChange}
                             className="flex-1 border p-0.5 rounded text-sm"
@@ -100,7 +115,6 @@ export default function DrugFormModal({ isOpen, onClose, onSubmit, initialData =
                         />
                     </div>
 
-                    {/* Select nhóm thuốc */}
                     <div className="flex items-center">
                         <label className="w-32 text-sm mr-4 text-right">Nhóm thuốc</label>
                         <select

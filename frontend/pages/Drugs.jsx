@@ -6,6 +6,7 @@ import DrugFormModal from "../components/drugs/DrugFormModal";
 export default function DrugsPage() {
     const [filters, setFilters] = useState({});
     const [showForm, setShowForm] = useState(false);
+    const [newDrug, setNewDrug] = useState(null); // Thêm state để lưu thuốc mới
 
     const handleAdd = async (drug) => {
         try {
@@ -14,11 +15,17 @@ export default function DrugsPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(drug),
             });
+            if (!res.ok) {
+                throw new Error("Lỗi khi thêm thuốc");
+            }
             const result = await res.json();
             console.log("✅ Thêm thuốc:", result);
+            setNewDrug(result); // Lưu thuốc mới để truyền cho DrugList
             setShowForm(false);
+            return result; // Trả về thuốc mới
         } catch (err) {
             console.error("❌ Lỗi:", err);
+            alert("Lỗi khi thêm thuốc: " + err.message);
         }
     };
 
@@ -35,8 +42,12 @@ export default function DrugsPage() {
                     </button>
                 }
             />
-            <DrugList filters={filters} />
-            <DrugFormModal isOpen={showForm} onClose={() => setShowForm(false)} onSubmit={handleAdd} />
+            <DrugList filters={filters} newDrug={newDrug} setNewDrug={setNewDrug} />
+            <DrugFormModal
+                isOpen={showForm}
+                onClose={() => setShowForm(false)}
+                onSubmit={handleAdd}
+            />
         </div>
     );
 }
