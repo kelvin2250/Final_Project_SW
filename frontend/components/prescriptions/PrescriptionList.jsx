@@ -53,7 +53,7 @@ export default function PrescriptionList({ filters }) {
                                 data={p}
                                 index={index}
                                 isSelected={phieuChon?.MaPhieuKham === p.MaPhieuKham}
-                                onClick={async () => {
+                                onToggle={async () => {
                                     const isSelected = phieuChon?.MaPhieuKham === p.MaPhieuKham;
                                     if (isSelected) {
                                         setPhieuChon(null);
@@ -64,8 +64,15 @@ export default function PrescriptionList({ filters }) {
                                         setSelectedPatient(patient);
                                     }
                                 }}
-                                
+                                onDeleted={(deletedId) => {
+                                    setPhieuKhams(prev => prev.filter(p => p.MaPhieuKham !== deletedId));
+                                    if (phieuChon?.MaPhieuKham === deletedId) {
+                                        setPhieuChon(null);
+                                        setSelectedPatient(null);
+                                    }
+                                }}
                             />
+
                             {phieuChon?.MaPhieuKham === p.MaPhieuKham && (
                                 <tr className="border-t border-gray-200">
                                     <td colSpan="7" className="bg-gray-50 px-4 py-4">

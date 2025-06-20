@@ -39,6 +39,7 @@ class BenhNhanBase(BaseModel):
     TienSu: Optional[str] = None
     NgayTao: Optional[datetime] = None  # dùng datetime vì DB đang để datetime
     
+    
 class BenhNhanCreate(BenhNhanBase):
     pass
 class BenhNhanOut(BenhNhanBase):
@@ -46,42 +47,42 @@ class BenhNhanOut(BenhNhanBase):
     NgayTao: datetime
     class Config:
         orm_mode = True
-class BenhNhanUpdate(BaseModel):
-    HoTen: Optional[str]
-    GioiTinh: Optional[str]
-    NamSinh: Optional[int]
-    SoDienThoai: Optional[str]
-    DiaChi: Optional[str]
-    MaNgheNghiep: Optional[int]
-    Nhom: Optional[str]
-    CanNang: Optional[float]
-    ChieuCao: Optional[float]
-    Mach: Optional[int]
-    NhietDo: Optional[float]
-    HuyetAp: Optional[str]
-    TienSu: Optional[str]
-    MaTinh: Optional[int]
-    MaQuan: Optional[int]
+class BenhNhanUpdate(BenhNhanBase):
+    pass
 
     class Config:
         orm_mode = True
 
+
+from pydantic import BaseModel
+
 class NhomThuocBase(BaseModel):
-    TenNhomThuoc: Optional[str]
-    MoTaNhomThuoc: Optional[str]
+    MaNhomThuoc: Optional[int] = None  # Tự động tạo trong DB, không cần gửi khi tạo
+    TenNhomThuoc: str  # Bắt buộc
+    MoTaNhomThuoc: str  # Bắt buộc
+
+class NhomThuocCreate(NhomThuocBase):
+    pass
+
+class NhomThuocUpdate(NhomThuocBase):
+    pass
+
+
 class NhomThuocOut(NhomThuocBase):
     MaNhomThuoc: int
     class Config:
         orm_mode = True
 
+
 class ThuocBase(BaseModel):
     TenThuoc: str
-    DonViTinh: Optional[str]
-    GiaBan: Optional[float]
-    TonKho: Optional[int]
-    CachDung: Optional[str] 
-    SoDangKy: Optional[str]
+    DonViTinh: Optional[str] = None
+    GiaBan: Optional[float]= None
+    TonKho: Optional[int]= None
+    CachDung: Optional[str] = None
+    SoDangKy: Optional[str]= None   
     MaNhomThuoc: Optional[int]
+    DaXoa: Optional[bool] = False 
 class ThuocCreate(ThuocBase):
     pass
 class ThuocOut(ThuocBase):
@@ -116,11 +117,9 @@ class CTThuocBase(BaseModel):
     MaPhieuKham: int
     MaThuoc: int
     SoLuong: Optional[int]
-    CachDung: Optional[str]
 class CTThuocCreate(BaseModel):
     MaThuoc: int
     SoLuong: Optional[int]
-    CachDung: Optional[str]
 class CTThuocOut(CTThuocBase):
     MaCTThuoc: int
     class Config:
@@ -141,13 +140,13 @@ class CTDVDTOut(CTDVDTBase):
 
 
 class PhieuKhamBase(BaseModel):
-    MaBenhNhan: int
-    ChanDoan: Optional[str]
-    NgayLap: Optional[date]
-    NguoiLap: Optional[str]
-    GhiChu: Optional[str]
-    TaiKham: Optional[date]
-    TrangThai: Optional[str] = "Chờ duyệt"
+    MaBenhNhan: Optional[int] = None
+    ChanDoan: Optional[str] = None
+    NgayLap: Optional[date] = None
+    NguoiLap: Optional[str] = None
+    GhiChu: Optional[str] = None
+    TaiKham: Optional[date] = None
+    TrangThai: Optional[bool] = True
 
 
 class PhieuKhamCreate(PhieuKhamBase):
@@ -214,6 +213,7 @@ class HoaDonBase(BaseModel):
     TrangThai: Optional[str] = "Chưa thanh toán"
     NguoiLap: Optional[str]
     GhiChu: Optional[str]
+    DaXoa: Optional[bool] = False
 
 class HoaDonCreate(HoaDonBase):
     thuocs: list[CTThuocOut]

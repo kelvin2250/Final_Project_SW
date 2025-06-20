@@ -106,3 +106,30 @@ export async function fetchPhieuKhamById(maPhieuKham) {
         return null;
     }
 }
+
+export const updatePatient = (id, data) =>
+    fetch(`${API_URL}/benhnhan/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    }).then(res => res.json());
+
+export const deletePatient = (id) =>
+    fetch(`${API_URL}/benhnhan/${id}`, {
+        method: "DELETE",
+    }).then(res => res.json());
+  
+
+
+export async function fetchPrescriptionsByPatient(patientId) {
+    const res = await fetch(`${API_URL}/benhnhan/${patientId}/phieukhams`);
+    if (!res.ok) throw new Error("Không thể tải đơn thuốc");
+    return res.json();
+}
+
+export async function fetchInvoicesByPatient(patientId) {
+    const res = await fetch(`${API_URL}/benhnhan/${patientId}/hoadons`);
+    if (!res.ok) throw new Error("Không thể tải hóa đơn");
+    return res.json();
+    }
+    

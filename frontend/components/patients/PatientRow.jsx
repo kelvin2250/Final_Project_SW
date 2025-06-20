@@ -1,11 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
-export default function PatientRow({ data, isSelected, onClick }) {
+export default function PatientRow({ data, isSelected, onClick, onEdit, onDelete }) {
     const navigate = useNavigate();
-
-    const handleExamine = () => {
-        navigate(`/prescriptions/create/${data.MaBenhNhan}`);
-    };
 
     return (
         <tr className={`text-center hover:bg-gray-50 border-t border-gray-300 ${isSelected ? "bg-gray-100" : ""}`}>
@@ -20,9 +16,9 @@ export default function PatientRow({ data, isSelected, onClick }) {
             <td className="border border-gray-300">{data.DiaChi}</td>
             <td className="border border-gray-300">{new Date(data.NgayTao).toLocaleDateString("vi-VN")}</td>
             <td className="space-x-2 border border-gray-300">
-                <button onClick={handleExamine} title="Khám">👨‍⚕️</button>
-                <button title="Sửa">✏️</button>
-                <button title="Xoá">🗑️</button>
+                <button onClick={() => navigate(`/prescriptions/create/${data.MaBenhNhan}`)} title="Khám">👨‍⚕️</button>
+                <button onClick={onEdit} title="Sửa">✏️</button>
+                <button onClick={onDelete} title="Xoá">🗑️</button>
             </td>
         </tr>
     );

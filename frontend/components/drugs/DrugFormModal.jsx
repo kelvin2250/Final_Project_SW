@@ -1,23 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function DrugFormModal({ isOpen, onClose, onSubmit }) {
+export default function DrugFormModal({ isOpen, onClose, onSubmit, initialData = null }) {
     const [formData, setFormData] = useState({
-        MaThuoc: "",
         TenThuoc: "",
-        SoDangKy: "",
-        HoatChat: "",
         DonViTinh: "",
-        NhomThuoc: "",
-        GiaNhap: 0,
         GiaBan: 0,
-        SoLuongMacDinh: 1,
-        TonToiThieu: "",
+        TonKho: 0,
         CachDung: "",
+        SoDangKy: "",
+        MaNhomThuoc: "",
     });
+
+    const [nhomThuocList, setNhomThuocList] = useState([]);
+
+    // Gọi API lấy danh sách nhóm thuốc
+    useEffect(() => {
+        fetch("http://localhost:8000/api/nhomthuoc")
+            .then((res) => res.json())
+            .then((data) => {
+                setNhomThuocList(data);
+            })
+            .catch((err) => console.error("Lỗi khi lấy nhóm thuốc:", err));
+
+        if (initialData) {
+            setFormData({
+                TenThuoc: initialData.TenThuoc ?? "",
+                DonViTinh: initialData.DonViTinh ?? "",
+                GiaBan: initialData.GiaBan ?? 0,
+                TonKho: initialData.TonKho ?? 0,
+                CachDung: initialData.CachDung ?? "",
+                SoDangKy: initialData.SoDangKy ?? "",
+                MaNhomThuoc: initialData.MaNhomThuoc ?? "",
+            });
+        }
+    }, [initialData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleSubmit = () => {
@@ -30,22 +53,19 @@ export default function DrugFormModal({ isOpen, onClose, onSubmit }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-xl w-[60%] max-w-[850px] shadow-lg">
-                <h2 className="text-xl font-bold mb-6 text-teal-700">➕ Thêm thuốc</h2>
+                <h2 className="text-xl font-bold mb-6 text-teal-700">
+                    {formData.MaThuoc ? "✏️ Cập nhật thuốc" : "➕ Thêm thuốc"}
+                </h2>
 
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                     {[
-                        { label: "Mã thuốc", name: "MaThuoc", type: "text" },
-                        { label: "Chọn nhóm", name: "NhomThuoc", type: "text" },
                         { label: "Tên thuốc", name: "TenThuoc", type: "text" },
-                        { label: "Giá bán", name: "GiaBan", type: "number" },
-                        { label: "Số đăng ký", name: "SoDangKy", type: "text" },
-                        { label: "Giá nhập", name: "GiaNhap", type: "number" },
-                        { label: "SL mặc định", name: "SoLuongMacDinh", type: "number" },
                         { label: "Đơn vị tính", name: "DonViTinh", type: "text" },
-                        { label: "Tồn tối thiểu", name: "TonToiThieu", type: "text" },
+                        { label: "Cách dùng", name: "CachDung", type: "text" },
+                        { label: "Số đăng ký", name: "SoDangKy", type: "text" },
                     ].map(({ label, name, type }) => (
                         <div className="flex items-center" key={name}>
-                            <label className="w-20 text-sm mr-4 text-right">{label}</label>
+                            <label className="w-32 text-sm mr-4 text-right">{label}</label>
                             <input
                                 name={name}
                                 type={type}
@@ -56,22 +76,62 @@ export default function DrugFormModal({ isOpen, onClose, onSubmit }) {
                         </div>
                     ))}
 
-                    {/* Cách dùng - full width dòng cuối */}
-                    <div className="col-span-2 flex items-center">
-                        <label className="w-20 text-sm text-right mr-4">Cách dùng</label>
+                    {/* Input giá bán và tồn kho (type text) */}
+                    <div className="flex items-center">
+                        <label className="w-32 text-sm mr-4 text-right">Giá bán</label>
                         <input
-                            name="CachDung"
-                            value={formData.CachDung}
+                            name="GiaBan"
+                            type="text"
+                            value={formData.GiaBan}
                             onChange={handleChange}
-                            className="flex-1 border rounded text-sm p-0.5"
+                            className="flex-1 border p-0.5 rounded text-sm"
+                            placeholder="Nhập giá bán"
                         />
+                    </div>
+                    <div className="flex items-center">
+                        <label className="w-32 text-sm mr-4 text-right">Tồn kho</label>
+                        <input
+                            name="TonKho"
+                            type="text"
+                            value={formData.TonKho}
+                            onChange={handleChange}
+                            className="flex-1 border p-0.5 rounded text-sm"
+                            placeholder="Nhập tồn kho"
+                        />
+                    </div>
+
+                    {/* Select nhóm thuốc */}
+                    <div className="flex items-center">
+                        <label className="w-32 text-sm mr-4 text-right">Nhóm thuốc</label>
+                        <select
+                            name="MaNhomThuoc"
+                            value={formData.MaNhomThuoc}
+                            onChange={handleChange}
+                            className="flex-1 border p-0.5 rounded text-sm"
+                        >
+                            <option value="">Chọn nhóm thuốc</option>
+                            {nhomThuocList.map((nhom) => (
+                                <option key={nhom.MaNhomThuoc} value={nhom.MaNhomThuoc}>
+                                    {nhom.TenNhomThuoc}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
-                {/* Buttons */}
                 <div className="flex justify-end gap-3 mt-6">
-                    <button className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition">Hoàn tất</button>
-                    <button className="bg-gray-500 text-white px-5 py-2 rounded hover:bg-gray-600 transition" onClick={onClose}>Bỏ qua</button>
+                    <button
+                        onClick={handleSubmit}
+                        className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition"
+                    >
+                        {formData.MaThuoc ? "Cập nhật" : "Hoàn tất"}
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="bg-gray-500 text-white px-5 py-2 rounded hover:bg-gray-600 transition"
+                    >
+                        Bỏ qua
+                    </button>
                 </div>
             </div>
         </div>

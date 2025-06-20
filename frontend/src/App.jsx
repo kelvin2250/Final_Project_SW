@@ -28,6 +28,7 @@ function App() {
           <Route path="/prescriptions/create/:MaBenhNhan" element={<PrescriptionForm />} />
           <Route path="/invoices/create/:MaPhieuKham" element={<InvoiceForm />} />
           <Route path="/invoices/create" element={<InvoiceForm />} />
+          <Route path="/prescriptions/edit/:MaPhieuKham" element={<PrescriptionForm />} />
         </Routes>
       </Router>
     </div>

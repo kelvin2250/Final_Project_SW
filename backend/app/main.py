@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import benhnhan, phieukham, dvdt, thuoc, hoadon
+from app.api.routers import benhnhan, phieukham, dvdt, thuoc, hoadon, nhomthuoc
 
 app = FastAPI()
 
@@ -18,5 +18,6 @@ app.add_middleware(
 app.include_router(benhnhan.router, prefix="/api")
 app.include_router(phieukham.router, prefix="/api")
 app.include_router(thuoc.router, prefix="/api")
+app.include_router(nhomthuoc.router, prefix="/api")
 app.include_router(dvdt.router, prefix="/api")
 app.include_router(hoadon.router, prefix="/api")

@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Enum, Text, ForeignKey, Float
+from sqlalchemy import Column,Boolean, Integer, String, Date, DateTime, Enum, Text, ForeignKey, Float
 from app.db.base import Base
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 class BenhNhan(Base):
@@ -27,6 +27,7 @@ class BenhNhan(Base):
     HuyetAp = Column(String(20))
     TienSu = Column(Text)
     Nhom = Column(Text)
+    DaXoa = Column(Boolean, default=False) 
 class Tinh(Base):
     __tablename__ = "TINH"
     MaTinh = Column(Integer, primary_key=True, autoincrement=True)
@@ -46,8 +47,9 @@ class NgheNghiep(Base):
 class NhomThuoc(Base):
     __tablename__ = "NHOMTHUOC"
     MaNhomThuoc = Column(Integer, primary_key=True, autoincrement=True)
-    TenNhomThuoc = Column(String(100), nullable=True)
-    MoTaNhomThuoc = Column(Text, nullable=True)
+    TenNhomThuoc = Column(String(100), nullable=False)  # Bắt buộc
+    MoTaNhomThuoc = Column(Text, nullable=False)  # Bắt buộc
+
 
 class Thuoc(Base):
     __tablename__ = "THUOC"
@@ -59,7 +61,8 @@ class Thuoc(Base):
     CachDung = Column(Text, nullable=True)
     SoDangKy = Column(String(50), nullable=True)
     MaNhomThuoc = Column(Integer, ForeignKey("NHOMTHUOC.MaNhomThuoc"))
-    NgayTao = Column(DateTime, default=datetime.time)
+    NgayTao = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    DaXoa = Column(Boolean, default=False)  
 
 class NhomDVDT(Base):
     __tablename__ = "NHOMDVDT"
@@ -86,8 +89,7 @@ class PhieuKham(Base):
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
     TaiKham = Column(Date, nullable=True)
-    TrangThai = Column(String(50), nullable=True)
-    
+    TrangThai = Column(Boolean, default=True)
     benhnhan = relationship("BenhNhan")
 
 class CT_Thuoc(Base):
@@ -96,7 +98,7 @@ class CT_Thuoc(Base):
     MaPhieuKham = Column(Integer, ForeignKey("PHIEUKHAM.MaPhieuKham"))
     MaThuoc = Column(Integer, ForeignKey("THUOC.MaThuoc"))
     SoLuong = Column(Integer, nullable=True)
-    CachDung = Column(Text, nullable=True)
+
 
 class CT_DVDT(Base):
     __tablename__ = "CT_DVDT"
@@ -153,6 +155,7 @@ class HoaDon(Base):
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
     NgayTao = Column(DateTime, default=datetime.utcnow)
+    DaXoa = Column(Boolean, default=False) 
 
 
 class CT_HoaDonThuoc(Base):

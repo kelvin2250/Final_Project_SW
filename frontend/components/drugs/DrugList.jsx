@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import DrugRow from "./DrugRow";
+import DrugFormModal from "./DrugFormModal"; // Import modal
 
 export default function DrugList() {
     const [drugs, setDrugs] = useState([]);
     const [groups, setGroups] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState(null); // null = tất cả
+    const [isEditing, setIsEditing] = useState(false);
+    const [selectedDrug, setSelectedDrug] = useState(null); // Để chứa dữ liệu thuốc khi chỉnh sửa
 
+    // Lấy dữ liệu thuốc và nhóm thuốc từ API
     useEffect(() => {
         fetch("http://localhost:8000/api/thuoc")
             .then(res => res.json())
@@ -18,9 +22,49 @@ export default function DrugList() {
             .catch(console.error);
     }, []);
 
+    // Lọc thuốc theo nhóm đã chọn
     const filteredDrugs = selectedGroup
         ? drugs.filter(d => d.MaNhomThuoc === selectedGroup)
         : drugs;
+
+    // Hàm xử lý xóa thuốc
+    const handleDelete = (drugId) => {
+        if (window.confirm("Bạn có chắc muốn xóa thuốc này?")) {
+            fetch(`http://localhost:8000/api/thuoc/${drugId}`, {
+                method: "DELETE",
+            })
+                .then(() => {
+                    // Cập nhật lại danh sách thuốc sau khi xóa
+                    setDrugs(drugs.filter((drug) => drug.MaThuoc !== drugId));
+                })
+                .catch((err) => console.error("Xóa thuốc lỗi:", err));
+        }
+    };
+
+    // Hàm xử lý chỉnh sửa thuốc
+    const handleEdit = (drug) => {
+        setIsEditing(true);
+        setSelectedDrug(drug); // Cập nhật dữ liệu thuốc đang chỉnh sửa
+    };
+
+    // Hàm xử lý lưu cập nhật thuốc
+    const handleSave = (updatedDrug) => {
+        fetch(`http://localhost:8000/api/thuoc/${updatedDrug.MaThuoc}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedDrug),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                // Cập nhật lại danh sách thuốc sau khi chỉnh sửa
+                setDrugs(drugs.map(drug => drug.MaThuoc === data.MaThuoc ? data : drug));
+                setIsEditing(false);
+                setSelectedDrug(null);
+            })
+            .catch((err) => console.error("Cập nhật thuốc lỗi:", err));
+    };
 
     return (
         <div className="grid grid-cols-5 gap-6 mt-4">
@@ -66,13 +110,23 @@ export default function DrugList() {
                             <DrugRow
                                 key={drug.MaThuoc}
                                 data={drug}
-                                onEdit={() => console.log("🛠️ Sửa", drug)}
-                                onDelete={() => console.log("🗑️ Xóa", drug)}
+                                onEdit={() => handleEdit(drug)}
+                                onDelete={() => handleDelete(drug.MaThuoc)}
                             />
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {/* Modal chỉnh sửa thuốc */}
+            {isEditing && (
+                <DrugFormModal
+                    isOpen={isEditing}
+                    onClose={() => { setIsEditing(false); setSelectedDrug(null); }}
+                    onSubmit={handleSave}  // Lưu lại sau khi chỉnh sửa
+                    initialData={selectedDrug} // Truyền dữ liệu thuốc cần sửa
+                />
+            )}
         </div>
     );
 }

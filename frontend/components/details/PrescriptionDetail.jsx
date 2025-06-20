@@ -18,9 +18,13 @@ export default function PrescriptionDetail({ data }) {
     useEffect(() => {
         if (!MaPhieuKham) return;
         fetchChiTietThuoc(MaPhieuKham)
-            .then(setMedicines)
+            .then((data) => {
+                console.log("Chi tiết thuốc:", data);
+                setMedicines(data);
+            })
             .catch((err) => console.error("Lỗi khi load thuốc:", err));
     }, [MaPhieuKham]);
+    
 
     const totalQuantity = medicines.reduce(
         (sum, med) => sum + (med.SoLuong || 0),
@@ -54,7 +58,7 @@ export default function PrescriptionDetail({ data }) {
                             <td className="border px-2 py-1 font-medium">{med.TenThuoc}</td>
                             <td className="border px-2 py-1 text-center">{med.SoLuong}</td>
                             <td className="border px-2 py-1">{med.DonViTinh}</td>
-                            <td className="border px-2 py-1">{med.CachDungChiTiet}</td>
+                            <td className="border px-2 py-1">{med.CachDung}</td>
                         </tr>
                     ))}
                     <tr className="font-semibold">
