@@ -27,7 +27,7 @@ class BenhNhan(Base):
     HuyetAp = Column(String(20))
     TienSu = Column(Text)
     Nhom = Column(Text)
-    DaXoa = Column(Boolean, default=False) 
+    DaXoa = Column(Boolean, default=False)
 class Tinh(Base):
     __tablename__ = "TINH"
     MaTinh = Column(Integer, primary_key=True, autoincrement=True)
@@ -56,13 +56,13 @@ class Thuoc(Base):
     MaThuoc = Column(Integer, primary_key=True, autoincrement=True)
     TenThuoc = Column(String(100), nullable=False)
     DonViTinh = Column(String(20), nullable=True)
-    GiaBan = Column(Integer, nullable=True)
+    GiaBan = Column(Float, nullable=True)
     TonKho = Column(Integer, nullable=True)
     CachDung = Column(Text, nullable=True)
     SoDangKy = Column(String(50), nullable=True)
     MaNhomThuoc = Column(Integer, ForeignKey("NHOMTHUOC.MaNhomThuoc"))
     NgayTao = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    DaXoa = Column(Boolean, default=False)  
+    DaXoa = Column(Boolean, default=False)
 
 class NhomDVDT(Base):
     __tablename__ = "NHOMDVDT"
@@ -114,17 +114,24 @@ class PhieuNhap(Base):
     NgayNhap = Column(Date, nullable=True)
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
-    NgayTao = Column(DateTime, default=datetime.utcnow)
+    NgayTao = Column(DateTime, server_default=func.current_timestamp())
+
+    # Relationship to chi tiet phieu nhap
+    chi_tiet = relationship("CT_PhieuNhap", back_populates="phieu_nhap", cascade="all, delete-orphan")
 
 class CT_PhieuNhap(Base):
     __tablename__ = "CT_PHIEUNHAP"
     MaCTPhieuNhap = Column(Integer, primary_key=True, autoincrement=True)
     MaPhieuNhap = Column(Integer, ForeignKey("PHIEUNHAP.MaPhieuNhap"))
     MaThuoc = Column(Integer, ForeignKey("THUOC.MaThuoc"))
-    SoLuongNhap = Column(Integer, nullable=True)
-    GiaNhap = Column(Integer, nullable=True)
-    GiaBan = Column(Integer, nullable=True)
+    SoLuongNhap = Column(Integer, nullable=False)
+    GiaNhap = Column(Float, nullable=False)
+    GiaBan = Column(Float, nullable=True)
     HanSuDung = Column(Date, nullable=True)
+
+    # Relationships
+    phieu_nhap = relationship("PhieuNhap", back_populates="chi_tiet")
+    thuoc = relationship("Thuoc")
 
 class PhieuXuat(Base):
     __tablename__ = "PHIEUXUAT"
@@ -155,7 +162,7 @@ class HoaDon(Base):
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
     NgayTao = Column(DateTime, default=datetime.utcnow)
-    DaXoa = Column(Boolean, default=False) 
+    DaXoa = Column(Boolean, default=False)
     thuocs = relationship("CT_HoaDonThuoc", backref="hoadon")
     dichvus = relationship("CT_HoaDonDVDT", backref="hoadon")
     benhnhan = relationship("BenhNhan")

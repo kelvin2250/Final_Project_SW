@@ -5,7 +5,8 @@ import {
     generateDailyReport,
     generateMonthlyReport,
     getStatisticsOverview,
-    deleteBaoCao
+    deleteBaoCao,
+    downloadMonthlyReportCSV
 } from '../src/api';
 
 export default function Reports() {
@@ -117,6 +118,18 @@ export default function Reports() {
         }
     };
 
+    const handleDownloadMonthlyCSV = async () => {
+        try {
+            setLoading(true);
+            await downloadMonthlyReportCSV(monthlyReportForm.year, monthlyReportForm.month);
+            alert(`Tải xuống báo cáo CSV tháng ${monthlyReportForm.month}/${monthlyReportForm.year} thành công!`);
+        } catch (err) {
+            alert(`Lỗi khi tải xuống CSV: ${err.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
@@ -198,46 +211,7 @@ export default function Reports() {
                 </div>
 
                 {/* Generate Reports Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                    {/* Daily Report Form */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-xl font-semibold mb-4">Tạo báo cáo hàng ngày</h2>
-                        <form onSubmit={handleGenerateDailyReport}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Ngày báo cáo
-                                </label>
-                                <input
-                                    type="date"
-                                    value={dailyReportForm.reportDate}
-                                    onChange={(e) => setDailyReportForm({...dailyReportForm, reportDate: e.target.value})}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Người lập báo cáo
-                                </label>
-                                <input
-                                    type="text"
-                                    value={dailyReportForm.nguoiLap}
-                                    onChange={(e) => setDailyReportForm({...dailyReportForm, nguoiLap: e.target.value})}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                                    placeholder="Nhập tên người lập"
-                                    required
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-gray-400"
-                            >
-                                {loading ? 'Đang tạo...' : 'Tạo báo cáo hàng ngày'}
-                            </button>
-                        </form>
-                    </div>
-
+                <div className="gap-8 mb-8">
                     {/* Monthly Report Form */}
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h2 className="text-xl font-semibold mb-4">Tạo báo cáo hàng tháng</h2>
@@ -288,89 +262,38 @@ export default function Reports() {
                                     required
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 disabled:bg-gray-400"
-                            >
-                                {loading ? 'Đang tạo...' : 'Tạo báo cáo hàng tháng'}
-                            </button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 disabled:bg-gray-400"
+                                >
+                                    {loading ? 'Đang tạo...' : 'Tạo báo cáo hàng tháng'}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleDownloadMonthlyCSV}
+                                    disabled={loading}
+                                    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 disabled:bg-gray-400 flex items-center justify-center"
+                                >
+                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Tải CSV tháng {monthlyReportForm.month}/{monthlyReportForm.year}
+                                </button>
+                            </div>
                         </form>
-                    </div>
-                </div>
 
-                {/* Reports List */}
-                <div className="bg-white rounded-lg shadow-md">
-                    <div className="px-6 py-4 border-b">
-                        <h2 className="text-xl font-semibold">Danh sách báo cáo</h2>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Mã BC
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Loại báo cáo
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Thời gian BC
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Người lập
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Ngày tạo
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Thao tác
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {reports.map((report) => (
-                                    <tr key={report.MaBaoCao} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {report.MaBaoCao}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {report.LoaiBaoCao}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {formatDate(report.ThoiGianBaoCao)}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {report.NguoiLap}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {formatDate(report.NgayTao)}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button
-                                                onClick={() => handleDeleteReport(report.MaBaoCao)}
-                                                className="text-red-600 hover:text-red-900 mr-3"
-                                            >
-                                                Xóa
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
-                        {reports.length === 0 && !loading && (
-                            <div className="text-center py-8 text-gray-500">
-                                Chưa có báo cáo nào
-                            </div>
-                        )}
-
-                        {loading && reports.length === 0 && (
-                            <div className="text-center py-8 text-gray-500">
-                                Đang tải dữ liệu...
-                            </div>
-                        )}
+                        {/* CSV Info Panel */}
+                        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <h3 className="text-sm font-semibold text-blue-800 mb-2">📊 Báo cáo CSV bao gồm:</h3>
+                            <ul className="text-sm text-blue-700 space-y-1">
+                                <li>• Thống kê tổng quan (số bệnh nhân, doanh thu, hóa đơn)</li>
+                                <li>• Top 5 thuốc bán chạy nhất trong tháng</li>
+                                <li>• Phân tích doanh thu theo từng ngày</li>
+                                <li>• Chi tiết doanh thu thuốc và dịch vụ</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

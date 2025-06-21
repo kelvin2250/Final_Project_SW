@@ -1,5 +1,5 @@
-<<<<<<< HEAD
 from fastapi import APIRouter, Depends, HTTPException, Body, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from app.db.dependency import get_db
 from app.crud import baocao
@@ -112,62 +112,143 @@ def get_statistics_overview(
     db: Session = Depends(get_db)
 ):
     """Lấy thống kê tổng quan doanh thu"""
-    from sqlalchemy import func, and_
+    return baocao.get_overview_statistics(db, start_date, end_date)
 
-    # Điều kiện lọc theo ngày
-    date_filter = []
-    if start_date:
-        date_filter.append(models.HoaDon.NgayLap >= start_date)
-    if end_date:
-        date_filter.append(models.HoaDon.NgayLap <= end_date)
+@router.get("/generate/monthly-csv")
+def generate_monthly_csv_report(
+    year: int = Query(..., description="Năm"),
+    month: int = Query(..., description="Tháng (1-12)"),
+    db: Session = Depends(get_db)
+):
+    """Tạo báo cáo doanh thu hàng tháng dưới dạng CSV"""
+    from sqlalchemy import func, extract
+    import io
+    import csv
+    from datetime import datetime
 
-    # Tổng doanh thu
-    tong_doanh_thu = db.query(func.sum(models.HoaDon.TongTienThanhToan)).filter(
-        and_(*date_filter) if date_filter else True
-    ).scalar() or 0
+    if month < 1 or month > 12:
+        raise HTTPException(status_code=400, detail="Tháng phải từ 1 đến 12")
 
-    # Tổng số hóa đơn
-    tong_so_hoadon = db.query(func.count(models.HoaDon.MaHoaDon)).filter(
-        and_(*date_filter) if date_filter else True
-    ).scalar() or 0
+    try:
+        # Tổng số bệnh nhân trong tháng
+        tong_so_benhnhan = db.query(func.count(models.BenhNhan.MaBenhNhan)).filter(
+            extract('year', models.BenhNhan.NgayTao) == year,
+            extract('month', models.BenhNhan.NgayTao) == month,
+            models.BenhNhan.DaXoa == False
+        ).scalar() or 0
 
-    # Tổng số bệnh nhân
-    tong_so_benhnhan = db.query(func.count(models.BenhNhan.MaBenhNhan)).filter(
-        models.BenhNhan.DaXoa == False
-    ).scalar() or 0
+        # Tổng số hóa đơn trong tháng
+        tong_so_hoadon = db.query(func.count(models.HoaDon.MaHoaDon)).filter(
+            extract('year', models.HoaDon.NgayLap) == year,
+            extract('month', models.HoaDon.NgayLap) == month,
+            models.HoaDon.DaXoa == False
+        ).scalar() or 0
 
-    # Doanh thu trung bình mỗi hóa đơn
-    doanh_thu_tb = tong_doanh_thu / tong_so_hoadon if tong_so_hoadon > 0 else 0
+        # Tổng doanh thu trong tháng
+        tong_doanh_thu = db.query(func.sum(models.HoaDon.TongTienThanhToan)).filter(
+            extract('year', models.HoaDon.NgayLap) == year,
+            extract('month', models.HoaDon.NgayLap) == month,
+            models.HoaDon.DaXoa == False
+        ).scalar() or 0
 
-    return {
-        "tong_doanh_thu": float(tong_doanh_thu),
-        "tong_so_hoadon": tong_so_hoadon,
-        "tong_so_benhnhan": tong_so_benhnhan,
-        "doanh_thu_trung_binh": float(doanh_thu_tb),
-        "start_date": start_date,
-        "end_date": end_date
-    }
-=======
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from app import models, schemas
-from app.db.dependency import get_db
+        # Tổng tiền thuốc
+        tong_tien_thuoc = db.query(func.sum(models.CT_HoaDonThuoc.ThanhTienThuoc)).join(
+            models.HoaDon
+        ).filter(
+            extract('year', models.HoaDon.NgayLap) == year,
+            extract('month', models.HoaDon.NgayLap) == month,
+            models.HoaDon.DaXoa == False
+        ).scalar() or 0
 
-router = APIRouter(prefix="/baocao", tags=["Báo cáo"])
+        # Tổng tiền dịch vụ
+        tong_tien_dichvu = db.query(func.sum(models.CT_HoaDonDVDT.ThanhTienDichVu)).join(
+            models.HoaDon
+        ).filter(
+            extract('year', models.HoaDon.NgayLap) == year,
+            extract('month', models.HoaDon.NgayLap) == month,
+            models.HoaDon.DaXoa == False
+        ).scalar() or 0
 
-@router.post("/", response_model=schemas.BaoCaoOut)
-def tao_baocao(data: schemas.BaoCaoBase, db: Session = Depends(get_db)):
-    bc = models.BaoCao(**data.dict())
-    db.add(bc)
-    db.commit()
-    db.refresh(bc)
-    return bc
+        # Tổng số thuốc bán ra
+        tong_thuoc_ban_ra = db.query(func.sum(models.CT_HoaDonThuoc.SoLuongBan)).join(
+            models.HoaDon
+        ).filter(
+            extract('year', models.HoaDon.NgayLap) == year,
+            extract('month', models.HoaDon.NgayLap) == month,
+            models.HoaDon.DaXoa == False
+        ).scalar() or 0
 
-@router.post("/ct", response_model=schemas.CTBaoCaoOut)
-def ct_baocao(data: schemas.CTBaoCaoBase, db: Session = Depends(get_db)):
-    ct = models.CT_BaoCao(**data.dict())
-    db.add(ct)
-    db.commit()
-    db.refresh(ct)
-    return ct
->>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
+        # Top 5 thuốc bán chạy nhất
+        top_thuoc = db.query(
+            models.Thuoc.TenThuoc,
+            func.sum(models.CT_HoaDonThuoc.SoLuongBan).label('total_sold'),
+            func.sum(models.CT_HoaDonThuoc.ThanhTienThuoc).label('total_revenue')
+        ).join(models.CT_HoaDonThuoc).join(models.HoaDon).filter(
+            extract('year', models.HoaDon.NgayLap) == year,
+            extract('month', models.HoaDon.NgayLap) == month,
+            models.HoaDon.DaXoa == False
+        ).group_by(models.Thuoc.MaThuoc, models.Thuoc.TenThuoc).order_by(
+            func.sum(models.CT_HoaDonThuoc.SoLuongBan).desc()
+        ).limit(5).all()
+
+        # Thống kê theo ngày trong tháng
+        daily_stats = db.query(
+            func.date(models.HoaDon.NgayLap).label('ngay'),
+            func.count(models.HoaDon.MaHoaDon).label('so_hoadon'),
+            func.sum(models.HoaDon.TongTienThanhToan).label('doanh_thu')
+        ).filter(
+            extract('year', models.HoaDon.NgayLap) == year,
+            extract('month', models.HoaDon.NgayLap) == month,
+            models.HoaDon.DaXoa == False
+        ).group_by(func.date(models.HoaDon.NgayLap)).order_by(
+            func.date(models.HoaDon.NgayLap)
+        ).all()
+
+        # Tạo CSV content
+        output = io.StringIO()
+        writer = csv.writer(output)
+
+        # Header thông tin báo cáo
+        writer.writerow([f'BÁO CÁO DOANH THU THÁNG {month}/{year}'])
+        writer.writerow([f'Ngày tạo: {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}'])
+        writer.writerow([''])
+
+        # Thống kê tổng quan
+        writer.writerow(['THỐNG KÊ TỔNG QUAN'])
+        writer.writerow(['Chỉ số', 'Giá trị'])
+        writer.writerow(['Tổng số bệnh nhân', tong_so_benhnhan])
+        writer.writerow(['Tổng số hóa đơn', tong_so_hoadon])
+        writer.writerow(['Tổng doanh thu (VNĐ)', f'{tong_doanh_thu:,.0f}'])
+        writer.writerow(['Tổng tiền thuốc (VNĐ)', f'{tong_tien_thuoc:,.0f}'])
+        writer.writerow(['Tổng tiền dịch vụ (VNĐ)', f'{tong_tien_dichvu:,.0f}'])
+        writer.writerow(['Tổng số thuốc bán ra', tong_thuoc_ban_ra])
+        writer.writerow(['Doanh thu trung bình/hóa đơn (VNĐ)', f'{(tong_doanh_thu/tong_so_hoadon if tong_so_hoadon > 0 else 0):,.0f}'])
+        writer.writerow([''])
+
+        # Top thuốc bán chạy
+        writer.writerow(['TOP 5 THUỐC BÁN CHẠY NHẤT'])
+        writer.writerow(['Tên thuốc', 'Số lượng bán', 'Doanh thu (VNĐ)'])
+        for thuoc in top_thuoc:
+            writer.writerow([thuoc.TenThuoc, thuoc.total_sold, f'{thuoc.total_revenue:,.0f}'])
+        writer.writerow([''])
+
+        # Thống kê theo ngày
+        writer.writerow(['THỐNG KÊ THEO NGÀY'])
+        writer.writerow(['Ngày', 'Số hóa đơn', 'Doanh thu (VNĐ)'])
+        for stat in daily_stats:
+            writer.writerow([stat.ngay.strftime('%d/%m/%Y'), stat.so_hoadon, f'{stat.doanh_thu:,.0f}'])
+
+        output.seek(0)
+
+        # Tạo response
+        filename = f"bao_cao_thang_{month}_{year}.csv"
+        response = StreamingResponse(
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),
+            media_type='text/csv',
+            headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+        )
+
+        return response
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi khi tạo báo cáo CSV: {str(e)}")
