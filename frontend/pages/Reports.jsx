@@ -13,8 +13,8 @@ export default function Reports() {
     const [statistics, setStatistics] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [dateError, setDateError] = useState(""); // ✅ NEW
 
-    // Form states for generating reports
     const [dailyReportForm, setDailyReportForm] = useState({
         reportDate: new Date().toISOString().split('T')[0],
         nguoiLap: ''
@@ -31,7 +31,6 @@ export default function Reports() {
         endDate: ''
     });
 
-    // Load data on component mount
     useEffect(() => {
         loadReports();
         loadStatistics();
@@ -50,11 +49,15 @@ export default function Reports() {
     };
 
     const loadStatistics = async () => {
+        const { startDate, endDate } = statisticsFilter;
+        if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+            setDateError("'Đến ngày' không được nhỏ hơn 'Từ ngày'");
+            return;
+        }
+        setDateError(""); // ✅ clear error
+
         try {
-            const data = await getStatisticsOverview(
-                statisticsFilter.startDate || null,
-                statisticsFilter.endDate || null
-            );
+            const data = await getStatisticsOverview(startDate || null, endDate || null);
             setStatistics(data);
         } catch (err) {
             console.error('Error loading statistics:', err);
@@ -144,20 +147,18 @@ export default function Reports() {
                 <div className="bg-white rounded-lg shadow-md p-6 mb-8">
                     <h2 className="text-xl font-semibold mb-4">Thống kê tổng quan</h2>
 
-                    <div className="flex gap-4 mb-4">
+                    <div className="flex flex-wrap items-center gap-4 mb-2">
                         <input
                             type="date"
                             value={statisticsFilter.startDate}
-                            onChange={(e) => setStatisticsFilter({...statisticsFilter, startDate: e.target.value})}
+                            onChange={(e) => setStatisticsFilter({ ...statisticsFilter, startDate: e.target.value })}
                             className="border rounded px-3 py-2"
-                            placeholder="Từ ngày"
                         />
                         <input
                             type="date"
                             value={statisticsFilter.endDate}
-                            onChange={(e) => setStatisticsFilter({...statisticsFilter, endDate: e.target.value})}
+                            onChange={(e) => setStatisticsFilter({ ...statisticsFilter, endDate: e.target.value })}
                             className="border rounded px-3 py-2"
-                            placeholder="Đến ngày"
                         />
                         <button
                             onClick={loadStatistics}
@@ -166,6 +167,10 @@ export default function Reports() {
                             Lọc
                         </button>
                     </div>
+
+                    {dateError && (
+                        <p className="text-red-600 text-sm font-medium mb-2">{dateError}</p>
+                    )}
 
                     {statistics && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -196,7 +201,6 @@ export default function Reports() {
                         </div>
                     )}
                 </div>
-
                 {/* Generate Reports Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     {/* Daily Report Form */}
@@ -210,7 +214,7 @@ export default function Reports() {
                                 <input
                                     type="date"
                                     value={dailyReportForm.reportDate}
-                                    onChange={(e) => setDailyReportForm({...dailyReportForm, reportDate: e.target.value})}
+                                    onChange={(e) => setDailyReportForm({ ...dailyReportForm, reportDate: e.target.value })}
                                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                                     required
                                 />
@@ -222,7 +226,7 @@ export default function Reports() {
                                 <input
                                     type="text"
                                     value={dailyReportForm.nguoiLap}
-                                    onChange={(e) => setDailyReportForm({...dailyReportForm, nguoiLap: e.target.value})}
+                                    onChange={(e) => setDailyReportForm({ ...dailyReportForm, nguoiLap: e.target.value })}
                                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                                     placeholder="Nhập tên người lập"
                                     required
@@ -250,7 +254,7 @@ export default function Reports() {
                                     <input
                                         type="number"
                                         value={monthlyReportForm.year}
-                                        onChange={(e) => setMonthlyReportForm({...monthlyReportForm, year: parseInt(e.target.value)})}
+                                        onChange={(e) => setMonthlyReportForm({ ...monthlyReportForm, year: parseInt(e.target.value) })}
                                         className="w-full border border-gray-300 rounded-md px-3 py-2"
                                         min="2020"
                                         max="2030"
@@ -263,11 +267,11 @@ export default function Reports() {
                                     </label>
                                     <select
                                         value={monthlyReportForm.month}
-                                        onChange={(e) => setMonthlyReportForm({...monthlyReportForm, month: parseInt(e.target.value)})}
+                                        onChange={(e) => setMonthlyReportForm({ ...monthlyReportForm, month: parseInt(e.target.value) })}
                                         className="w-full border border-gray-300 rounded-md px-3 py-2"
                                         required
                                     >
-                                        {Array.from({length: 12}, (_, i) => (
+                                        {Array.from({ length: 12 }, (_, i) => (
                                             <option key={i + 1} value={i + 1}>
                                                 Tháng {i + 1}
                                             </option>
@@ -282,7 +286,7 @@ export default function Reports() {
                                 <input
                                     type="text"
                                     value={monthlyReportForm.nguoiLap}
-                                    onChange={(e) => setMonthlyReportForm({...monthlyReportForm, nguoiLap: e.target.value})}
+                                    onChange={(e) => setMonthlyReportForm({ ...monthlyReportForm, nguoiLap: e.target.value })}
                                     className="w-full border border-gray-300 rounded-md px-3 py-2"
                                     placeholder="Nhập tên người lập"
                                     required
@@ -374,6 +378,7 @@ export default function Reports() {
                     </div>
                 </div>
             </div>
+
         </>
     );
 }

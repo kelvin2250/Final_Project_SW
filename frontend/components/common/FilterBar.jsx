@@ -12,8 +12,14 @@ export default function FilterBar({
     const [keyword, setKeyword] = useState("");
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
+    const [error, setError] = useState("");
 
     const handleSearch = () => {
+        if (fromDate && toDate && toDate < fromDate) {
+            setError("'Đến ngày' không được trước 'Từ ngày'");
+            return;
+        }
+        setError("");
         onSearch?.({ keyword, fromDate, toDate });
     };
 
@@ -34,7 +40,14 @@ export default function FilterBar({
                     {showFromDate && (
                         <DatePicker
                             selected={fromDate}
-                            onChange={(date) => setFromDate(date)}
+                            onChange={(date) => {
+                                setFromDate(date);
+                                if (toDate && date && toDate < date) {
+                                    setError("'Đến ngày' không được trước 'Từ ngày'");
+                                } else {
+                                    setError("");
+                                }
+                            }}
                             placeholderText="Từ ngày"
                             dateFormat="dd/MM/yyyy"
                             className="px-4 py-1 rounded-full border border-gray-300 text-sm text-gray-700 placeholder-italic w-36"
@@ -47,7 +60,14 @@ export default function FilterBar({
                     {showToDate && (
                         <DatePicker
                             selected={toDate}
-                            onChange={(date) => setToDate(date)}
+                            onChange={(date) => {
+                                setToDate(date);
+                                if (fromDate && date && date < fromDate) {
+                                    setError("'Đến ngày' không được trước 'Từ ngày'");
+                                } else {
+                                    setError("");
+                                }
+                            }}
                             placeholderText="Đến ngày"
                             dateFormat="dd/MM/yyyy"
                             className="px-4 py-1 rounded-full border border-gray-300 text-sm text-gray-700 placeholder-italic w-36"
@@ -65,10 +85,13 @@ export default function FilterBar({
                     </button>
                 </div>
 
-                {/* Nút mở rộng bên phải */}
                 {extraButtons && <div className="flex items-center gap-2">{extraButtons}</div>}
-
             </div>
+
+            {/* Cảnh báo lỗi */}
+            {error && (
+                <p className="mt-2 text-sm text-red-600 font-medium">{error}</p>
+            )}
         </div>
     );
 }
