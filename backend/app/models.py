@@ -156,6 +156,10 @@ class HoaDon(Base):
     GhiChu = Column(Text, nullable=True)
     NgayTao = Column(DateTime, default=datetime.utcnow)
     DaXoa = Column(Boolean, default=False) 
+    thuocs = relationship("CT_HoaDonThuoc", backref="hoadon")
+    dichvus = relationship("CT_HoaDonDVDT", backref="hoadon")
+    benhnhan = relationship("BenhNhan")
+
 
 
 class CT_HoaDonThuoc(Base):
@@ -166,6 +170,7 @@ class CT_HoaDonThuoc(Base):
     SoLuongBan = Column(Integer, nullable=True)
     GiaBan = Column(Float, nullable=True)
     ThanhTienThuoc = Column(Float, nullable=True)
+    thuoc = relationship("Thuoc")
 
 
 class CT_HoaDonDVDT(Base):

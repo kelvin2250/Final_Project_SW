@@ -23,12 +23,13 @@ function App() {
           <Route path="/drugs" element={<Drugs />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/stock" element={<Stock />} />
-          <Route path="/prescriptions/new/:patientId" element={<PrescriptionForm />} /> {/* 👈 Thêm route này */}
+          <Route path="/prescriptions/new/:patientId" element={<PrescriptionForm />} />
           <Route path="/prescriptions/create" element={<PrescriptionForm />} />
           <Route path="/prescriptions/create/:MaBenhNhan" element={<PrescriptionForm />} />
           <Route path="/invoices/create/:MaPhieuKham" element={<InvoiceForm />} />
           <Route path="/invoices/create" element={<InvoiceForm />} />
           <Route path="/prescriptions/edit/:MaPhieuKham" element={<PrescriptionForm />} />
+          <Route path="/invoices/edit/:MaHoaDon" element={<InvoiceForm />} />
         </Routes>
       </Router>
     </div>

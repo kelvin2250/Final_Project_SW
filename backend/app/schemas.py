@@ -204,36 +204,22 @@ class CTPhieuXuatOut(CTPhieuXuatBase):
     class Config:
         orm_mode = True
 class HoaDonBase(BaseModel):
-    MaBenhNhan: int
-    MaPhieuKham: Optional[int]
-    NgayLap: Optional[date]
-    TongTienThuoc: Optional[float]
-    TongTienDichVu: Optional[float]
-    TongTienThanhToan: Optional[float]
+    MaBenhNhan: Optional[int] = None
+    MaPhieuKham: Optional[int] = None
+    NgayLap: date
+    TongTienThuoc: Optional[float] = 0
+    TongTienDichVu: Optional[float] = 0
+    TongTienThanhToan: Optional[float] = 0
     TrangThai: Optional[str] = "Chưa thanh toán"
-    NguoiLap: Optional[str]
-    GhiChu: Optional[str]
+    NguoiLap: str
+    GhiChu: Optional[str] = None
     DaXoa: Optional[bool] = False
 
-class HoaDonCreate(HoaDonBase):
-    thuocs: list[CTThuocOut]
-    dichvus: list[CTDVDTOut]
-class HoaDonOut(HoaDonBase):
-    MaHoaDon: int
-    NgayTao: datetime
-    class Config:
-        orm_mode = True
-
 class CTHoaDonThuocBase(BaseModel):
-    MaHoaDon: int
     MaThuoc: int
-    SoLuongBan: Optional[int]
-    GiaBan: Optional[float]
-    ThanhTienThuoc: Optional[float]
-class CTHoaDonThuocOut(CTHoaDonThuocBase):
-    MaCTHoaDonThuoc: int
-    class Config:
-        orm_mode = True
+    SoLuongBan: int
+    GiaBan: float
+    ThanhTienThuoc: float
 
 class CTHoaDonDVDTBase(BaseModel):
     MaHoaDon: int
@@ -244,6 +230,27 @@ class CTHoaDonDVDTOut(CTHoaDonDVDTBase):
     MaCTHoaDonDVDT: int
     class Config:
         orm_mode = True
+
+class CTHoaDonThuocOut(CTHoaDonThuocBase):
+    MaCTHoaDonThuoc: int
+    thuoc: Optional[ThuocOut] = None
+    class Config:
+        orm_mode = True
+
+class HoaDonCreate(HoaDonBase):
+    thuocs: list[CTHoaDonThuocBase]
+    dichvus: Optional[list[CTHoaDonDVDTBase]] = None
+
+class HoaDonOut(HoaDonBase):
+    MaHoaDon: Optional[int] = None
+    NgayTao: datetime
+    benhnhan: Optional[BenhNhanOut] = None
+    thuocs: list[CTHoaDonThuocOut]
+    dichvus: list[CTHoaDonDVDTOut] = None
+    class Config:
+        orm_mode = True
+
+
 class BaoCaoBase(BaseModel):
     LoaiBaoCao: Optional[str]
     ThoiGianBaoCao: Optional[date]

@@ -1,16 +1,21 @@
 import { Fragment, useState, useEffect } from "react";
-import { fetchPrescriptions, getPatientByMaBenhNhan } from "../../src/api"; // Đường dẫn đúng với file api bạn đặt
+import {
+    fetchPrescriptions,
+    getPatientByMaBenhNhan,
+    fetchInvoicesByPhieuKham
+} from "../../src/api";
 import PrescriptionTabs from "../tabDetail/PrescriptionTabs";
 import PrescriptionRow from "./PrescriptionRow";
 
 export default function PrescriptionList({ filters }) {
     const [phieuKhams, setPhieuKhams] = useState([]);
     const [phieuChon, setPhieuChon] = useState(null);
-    const { keyword = "", fromDate = null, toDate = null } = filters || {};
     const [selectedPatient, setSelectedPatient] = useState(null);
 
+    const { keyword = "", fromDate = null, toDate = null } = filters || {};
+
     useEffect(() => {
-        fetchPrescriptions().then(data => {
+        fetchPrescriptions().then((data) => {
             console.log("✅ Dữ liệu phiếu khám:", data);
             setPhieuKhams(data);
         });
@@ -59,13 +64,18 @@ export default function PrescriptionList({ filters }) {
                                         setPhieuChon(null);
                                         setSelectedPatient(null);
                                     } else {
-                                        setPhieuChon(p);
-                                        const patient = await getPatientByMaBenhNhan(p.MaBenhNhan);
+                                        const [patient, invoices] = await Promise.all([
+                                            getPatientByMaBenhNhan(p.MaBenhNhan),
+                                            fetchInvoicesByPhieuKham(p.MaPhieuKham),
+                                        ]);
+                                        setPhieuChon({ ...p, _invoices: invoices });
                                         setSelectedPatient(patient);
                                     }
                                 }}
                                 onDeleted={(deletedId) => {
-                                    setPhieuKhams(prev => prev.filter(p => p.MaPhieuKham !== deletedId));
+                                    setPhieuKhams((prev) =>
+                                        prev.filter((p) => p.MaPhieuKham !== deletedId)
+                                    );
                                     if (phieuChon?.MaPhieuKham === deletedId) {
                                         setPhieuChon(null);
                                         setSelectedPatient(null);
@@ -77,9 +87,9 @@ export default function PrescriptionList({ filters }) {
                                 <tr className="border-t border-gray-200">
                                     <td colSpan="7" className="bg-gray-50 px-4 py-4">
                                         <PrescriptionTabs
-                                            prescription={p}
+                                            prescription={phieuChon}
                                             patient={selectedPatient}
-                                            invoice={null}
+                                            invoices={phieuChon?._invoices || []}
                                         />
                                     </td>
                                 </tr>

@@ -31,8 +31,8 @@ export default function PatientTabs({ patient, prescriptions = [], invoices = []
 
             {tab === "info" && <PatientDetail data={patient} />}
 
-            {tab === "prescription" && (
-                prescriptions.length > 0 ? (
+            {tab === "prescription" &&
+                (prescriptions.length > 0 ? (
                     prescriptions.map((pres, i) => (
                         <div key={i} className="mb-4">
                             <PrescriptionDetail data={pres} />
@@ -40,20 +40,28 @@ export default function PatientTabs({ patient, prescriptions = [], invoices = []
                     ))
                 ) : (
                     <p className="text-sm italic text-gray-500">Chưa có đơn thuốc</p>
-                )
-            )}
+                ))}
 
-            {tab === "invoice" && (
-                invoices.length > 0 ? (
+            {tab === "invoice" &&
+                (invoices.length > 0 ? (
                     invoices.map((inv, i) => (
-                        <div key={i} className="mb-4">
+                        <div key={i} className="mb-6 border border-gray-200 rounded shadow-sm">
+                            <div className="bg-gray-100 px-3 py-2 flex justify-between items-center">
+                                <div>
+                                    <strong>Ngày:</strong>{" "}
+                                    {new Date(inv.NgayLap).toLocaleDateString("vi-VN")} —{" "}
+                                    <strong>Người lập:</strong> {inv.NguoiLap}
+                                </div>
+                                <div className="text-red-600 font-semibold">
+                                    {inv.TongTienThanhToan?.toLocaleString()} ₫
+                                </div>
+                            </div>
                             <InvoiceDetail data={inv} />
                         </div>
                     ))
                 ) : (
                     <p className="text-sm italic text-gray-500">Chưa có hóa đơn</p>
-                )
-            )}
+                ))}
         </div>
     );
 }

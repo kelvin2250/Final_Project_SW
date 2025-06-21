@@ -1,37 +1,8 @@
-// 📁 src/components/tabDetail/InvoiceTabs.jsx
 import { useState } from "react";
 import InvoiceDetail from "../details/InvoiceDetail";
 import PatientDetail from "../details/PatientDetail";
 
-// 🧪 Mock data mẫu (nếu chưa truyền props thực tế)
-// const mockInvoice = [
-//     {
-//         id: "HD00000001",
-//         patientName: "Killed Silve",
-//         age: "2003211",
-//         createdBy: "ThanhPhat",
-//         createdAt: "18-04-2025",
-//         total: 24400,
-//         items: [ // ✅ thêm vào đây
-//             { name: "Mobic 7.5mg", unit: "viên", quantity: 2, price: 11000, total: 22000 },
-//             { name: "Panagal Plus", unit: "viên", quantity: 1, price: 0, total: 0 },
-//             { name: "Tylenol", unit: "viên", quantity: 2, price: 1200, total: 2400 },
-//         ],
-//     },
-// ];
-
-
-const mockPatient = {
-    id: "BN00000001",
-    name: "Killed Silve",
-    gender: "Nam",
-    age: "2003211",
-    phone: "0939393939",
-    address: "Quận 5, TP.HCM",
-    created_at: "18-04-2025",
-};
-
-export default function InvoiceTabs({ invoice = mockInvoice, patient = mockPatient }) {
+export default function InvoiceTabs({ invoice, patient }) {
     const [tab, setTab] = useState("invoice");
 
     return (
@@ -39,22 +10,41 @@ export default function InvoiceTabs({ invoice = mockInvoice, patient = mockPatie
             <div className="flex space-x-4 border-b mb-4 text-sm">
                 <button
                     onClick={() => setTab("invoice")}
-                    className={`pb-1 ${tab === "invoice" ? "font-semibold border-b-2 border-emerald-600" : ""
-                        }`}
+                    className={`pb-1 ${tab === "invoice" ? "font-semibold border-b-2 border-emerald-600" : ""}`}
                 >
-                    Thông tin hóa đơn
+                    Chi tiết hóa đơn
                 </button>
                 <button
                     onClick={() => setTab("patient")}
-                    className={`pb-1 ${tab === "patient" ? "font-semibold border-b-2 border-emerald-600" : ""
-                        }`}
+                    className={`pb-1 ${tab === "patient" ? "font-semibold border-b-2 border-emerald-600" : ""}`}
                 >
                     Thông tin bệnh nhân
                 </button>
             </div>
 
-            {tab === "invoice" && <InvoiceDetail data={invoice} />}
-            {tab === "patient" && <PatientDetail data={patient} />}
+            {/* Tab: Chi tiết hóa đơn */}
+            {tab === "invoice" && (
+                <>
+                    <div className="mb-2 text-sm">
+                        <p><strong>Ngày lập:</strong> {new Date(invoice.NgayLap).toLocaleDateString("vi-VN")}</p>
+                        <p><strong>Người lập:</strong> {invoice.NguoiLap}</p>
+                        <p><strong>Trạng thái:</strong> {invoice.TrangThai}</p>
+                        <p><strong>Ghi chú:</strong> {invoice.GhiChu || "Không có"}</p>
+                    </div>
+                    <InvoiceDetail data={invoice} />
+                </>
+            )}
+
+            {/* Tab: Thông tin bệnh nhân */}
+            {tab === "patient" && (
+                <div className="mt-2">
+                    {invoice.benhnhan ? (
+                        <PatientDetail data={invoice.benhnhan} />
+                    ) : (
+                        <p className="text-sm italic text-gray-600">Khách lẻ – không có thông tin chi tiết.</p>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

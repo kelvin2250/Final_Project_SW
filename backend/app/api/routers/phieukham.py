@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from app.db.dependency import get_db
 from app.schemas import PhieuKhamCreate, PhieuKhamOut
 from app.crud import phieukham as crud
-
+from app.schemas import HoaDonOut
+from app.models import HoaDon
 router = APIRouter(prefix="/phieukham", tags=["Phiếu khám bệnh"])
 
 @router.post("/", response_model=PhieuKhamOut)
@@ -42,3 +43,11 @@ def delete(id: int, db: Session = Depends(get_db)):
     if not phieu:
         raise HTTPException(status_code=404, detail="Không tìm thấy phiếu khám để xoá")
     return phieu
+
+@router.get("/{maPK}/hoadons", response_model=list[HoaDonOut])
+def get_hoadons_by_phieukham(maPK: int, db: Session = Depends(get_db)):
+    hoadons = db.query(HoaDon).filter(
+        HoaDon.MaPhieuKham == maPK,
+        HoaDon.DaXoa == False
+    ).all()
+    return hoadons

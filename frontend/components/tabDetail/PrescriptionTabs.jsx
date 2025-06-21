@@ -1,16 +1,14 @@
-// 📁 src/components/tabDetail/PrescriptionTabs.jsx
 import { useState } from "react";
 import PrescriptionDetail from "../details/PrescriptionDetail";
 import PatientDetail from "../details/PatientDetail";
 import InvoiceDetail from "../details/InvoiceDetail";
+
 export default function PrescriptionTabs({
     prescription,
     patient,
-    invoice 
+    invoices = [],
 }) {
     const [tab, setTab] = useState("prescription");
-    console.log("đơn thuốc: ", prescription);
-    console.log("bệnh nhân: ", patient);
 
     return (
         <div>
@@ -34,9 +32,27 @@ export default function PrescriptionTabs({
                     Thông tin hóa đơn
                 </button>
             </div>
+
             {tab === "prescription" && <PrescriptionDetail data={prescription} />}
             {tab === "patient" && <PatientDetail data={patient} />}
-            {tab === "invoice" && <InvoiceDetail data={invoice} />}
+            {tab === "invoice" && (
+                invoices.length > 0 ? (
+                    invoices.map((inv, i) => (
+                        <div key={inv.MaHoaDon || i} className="mb-6 border border-gray-300 rounded shadow-sm">
+                            <div className="bg-gray-100 px-3 py-2 flex justify-between items-center">
+                                <div>
+                                    <strong>Ngày:</strong>{" "}
+                                    {new Date(inv.NgayLap).toLocaleDateString("vi-VN")} —{" "}
+                                    <strong>Người lập:</strong> {inv.NguoiLap}
+                                </div>
+                            </div>
+                            <InvoiceDetail data={inv} />
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-sm italic text-gray-500 px-2">Không có hóa đơn nào cho phiếu khám này.</p>
+                )
+            )}
         </div>
     );
 }
