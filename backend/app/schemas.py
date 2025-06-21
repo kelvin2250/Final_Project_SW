@@ -38,8 +38,8 @@ class BenhNhanBase(BaseModel):
     HuyetAp: Optional[str] = None
     TienSu: Optional[str] = None
     NgayTao: Optional[datetime] = None  # dùng datetime vì DB đang để datetime
-    
-    
+
+
 class BenhNhanCreate(BenhNhanBase):
     pass
 class BenhNhanOut(BenhNhanBase):
@@ -80,9 +80,9 @@ class ThuocBase(BaseModel):
     GiaBan: Optional[float]= None
     TonKho: Optional[int]= None
     CachDung: Optional[str] = None
-    SoDangKy: Optional[str]= None   
+    SoDangKy: Optional[str]= None
     MaNhomThuoc: Optional[int]
-    DaXoa: Optional[bool] = False 
+    DaXoa: Optional[bool] = False
 class ThuocCreate(ThuocBase):
     pass
 class ThuocOut(ThuocBase):
@@ -155,7 +155,7 @@ class PhieuKhamCreate(PhieuKhamBase):
 
 class PhieuKhamOut(PhieuKhamBase):
     MaPhieuKham: int
-    benhnhan: Optional[BenhNhanOut]  
+    benhnhan: Optional[BenhNhanOut]
     class Config:
         orm_mode = True
 
@@ -166,6 +166,13 @@ class PhieuNhapBase(BaseModel):
     NgayNhap: Optional[date]
     NguoiLap: Optional[str]
     GhiChu: Optional[str]
+
+class PhieuNhapCreate(PhieuNhapBase):
+    chi_tiet: Optional[list['CTPhieuNhapCreate']] = None
+
+class PhieuNhapUpdate(PhieuNhapBase):
+    pass
+
 class PhieuNhapOut(PhieuNhapBase):
     MaPhieuNhap: int
     NgayTao: datetime
@@ -173,14 +180,18 @@ class PhieuNhapOut(PhieuNhapBase):
         orm_mode = True
 
 class CTPhieuNhapBase(BaseModel):
-    MaPhieuNhap: int
     MaThuoc: int
     SoLuongNhap: Optional[int]
     GiaNhap: Optional[float]
     GiaBan: Optional[float]
     HanSuDung: Optional[date]
+
+class CTPhieuNhapCreate(CTPhieuNhapBase):
+    pass
+
 class CTPhieuNhapOut(CTPhieuNhapBase):
     MaCTPhieuNhap: int
+    MaPhieuNhap: int
     class Config:
         orm_mode = True
 
@@ -188,6 +199,13 @@ class PhieuXuatBase(BaseModel):
     NgayXuat: Optional[date]
     NguoiLap: Optional[str]
     GhiChu: Optional[str]
+
+class PhieuXuatCreate(PhieuXuatBase):
+    chi_tiet: Optional[list['CTPhieuXuatCreate']] = None
+
+class PhieuXuatUpdate(PhieuXuatBase):
+    pass
+
 class PhieuXuatOut(PhieuXuatBase):
     MaPhieuXuat: int
     NgayTao: datetime
@@ -195,12 +213,16 @@ class PhieuXuatOut(PhieuXuatBase):
         orm_mode = True
 
 class CTPhieuXuatBase(BaseModel):
-    MaPhieuXuat: int
     MaThuoc: int
     SoLuongXuat: Optional[int]
     GiaBan: Optional[float]
+
+class CTPhieuXuatCreate(CTPhieuXuatBase):
+    pass
+
 class CTPhieuXuatOut(CTPhieuXuatBase):
     MaCTPhieuXuat: int
+    MaPhieuXuat: int
     class Config:
         orm_mode = True
 class HoaDonBase(BaseModel):
@@ -256,6 +278,13 @@ class BaoCaoBase(BaseModel):
     ThoiGianBaoCao: Optional[date]
     NguoiLap: Optional[str]
     GhiChu: Optional[str]
+
+class BaoCaoCreate(BaoCaoBase):
+    pass
+
+class BaoCaoUpdate(BaoCaoBase):
+    pass
+
 class BaoCaoOut(BaoCaoBase):
     MaBaoCao: int
     NgayTao: datetime
@@ -269,6 +298,10 @@ class CTBaoCaoBase(BaseModel):
     TongTienThuoc: Optional[float]
     TongTienDichVu: Optional[float]
     TongDoanhThu: Optional[float]
+
+class CTBaoCaoCreate(CTBaoCaoBase):
+    pass
+
 class CTBaoCaoOut(CTBaoCaoBase):
     MaCTBaoCao: int
     class Config:
