@@ -82,8 +82,6 @@ export default function PrescriptionDetail({ data }) {
 
             <div className="flex flex-wrap gap-2">
                 <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded" onClick={handleMakeInvoice}>LẬP HÓA ĐƠN</button>
-                <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">THAY ĐỔI</button>
-                <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">XÓA</button>
             </div>
         </div>
     );
