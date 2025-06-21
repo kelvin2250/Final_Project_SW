@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000/api";
+const API_URL = "http://localhost:8001/api";
 
 export async function fetchPatients() {
     const res = await fetch(`${API_URL}/benhnhan/`);
@@ -188,4 +188,123 @@ export const deleteInvoice = async (maHoaDon) => {
         throw new Error(JSON.stringify(errorData.detail) || "Lỗi khi xóa hóa đơn");
     }
     return response.json();
+}
+
+// BaoCao API functions
+export async function fetchBaoCao() {
+    try {
+        const res = await fetch(`${API_URL}/baocao/`);
+        if (!res.ok) throw new Error("Không thể tải danh sách báo cáo");
+        return await res.json();
+    } catch (err) {
+        console.error("❌ Lỗi fetchBaoCao:", err);
+        return [];
+    }
+}
+
+export async function createBaoCao(baocao) {
+    try {
+        const res = await fetch(`${API_URL}/baocao/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(baocao),
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || "Không thể tạo báo cáo");
+        }
+        return res.json();
+    } catch (err) {
+        console.error("❌ Lỗi createBaoCao:", err);
+        throw err;
+    }
+}
+
+export async function getBaoCaoById(id) {
+    try {
+        const res = await fetch(`${API_URL}/baocao/${id}`);
+        if (!res.ok) throw new Error("Không thể lấy dữ liệu báo cáo");
+        return await res.json();
+    } catch (err) {
+        console.error("❌ Lỗi getBaoCaoById:", err);
+        return null;
+    }
+}
+
+export async function getChiTietBaoCao(id) {
+    try {
+        const res = await fetch(`${API_URL}/baocao/${id}/chitiet`);
+        if (!res.ok) throw new Error("Không thể lấy chi tiết báo cáo");
+        return await res.json();
+    } catch (err) {
+        console.error("❌ Lỗi getChiTietBaoCao:", err);
+        return null;
+    }
+}
+
+export async function generateDailyReport(reportDate, nguoiLap) {
+    try {
+        const res = await fetch(`${API_URL}/baocao/generate/daily?report_date=${reportDate}&nguoi_lap=${encodeURIComponent(nguoiLap)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || "Không thể tạo báo cáo hàng ngày");
+        }
+        return res.json();
+    } catch (err) {
+        console.error("❌ Lỗi generateDailyReport:", err);
+        throw err;
+    }
+}
+
+export async function generateMonthlyReport(year, month, nguoiLap) {
+    try {
+        const res = await fetch(`${API_URL}/baocao/generate/monthly?year=${year}&month=${month}&nguoi_lap=${encodeURIComponent(nguoiLap)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || "Không thể tạo báo cáo hàng tháng");
+        }
+        return res.json();
+    } catch (err) {
+        console.error("❌ Lỗi generateMonthlyReport:", err);
+        throw err;
+    }
+}
+
+export async function getStatisticsOverview(startDate = null, endDate = null) {
+    try {
+        let url = `${API_URL}/baocao/statistics/overview`;
+        const params = new URLSearchParams();
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+        if (params.toString()) url += `?${params.toString()}`;
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Không thể lấy thống kê tổng quan");
+        return await res.json();
+    } catch (err) {
+        console.error("❌ Lỗi getStatisticsOverview:", err);
+        return null;
+    }
+}
+
+export async function deleteBaoCao(id) {
+    try {
+        const res = await fetch(`${API_URL}/baocao/${id}`, {
+            method: "DELETE",
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.detail || "Không thể xóa báo cáo");
+        }
+        return res.json();
+    } catch (err) {
+        console.error("❌ Lỗi deleteBaoCao:", err);
+        throw err;
+    }
 }
