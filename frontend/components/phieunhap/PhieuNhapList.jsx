@@ -16,7 +16,7 @@ const PhieuNhap = () => {
     const loadPhieuNhap = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:8001/api/phieunhap/');
+            const response = await fetch('http://localhost:8000/api/phieunhap/');
             if (!response.ok) throw new Error('Failed to fetch');
             const data = await response.json();
             setPhieuNhapList(data);
@@ -34,7 +34,7 @@ const PhieuNhap = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8001/api/phieunhap/', {
+            const response = await fetch('http://localhost:8000/api/phieunhap/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const PhieuNhap = () => {
         if (!confirm('Bạn có chắc chắn muốn xóa phiếu nhập này?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8001/api/phieunhap/${id}`, {
+            const response = await fetch(`http://localhost:8000/api/phieunhap/${id}`, {
                 method: 'DELETE',
             });
 

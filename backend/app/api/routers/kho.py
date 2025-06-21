@@ -7,7 +7,7 @@ router = APIRouter(prefix="/kho", tags=["Kho"])
 
 @router.post("/nhap", response_model=schemas.PhieuNhapOut)
 def tao_phieu_nhap(data: schemas.PhieuNhapBase, db: Session = Depends(get_db)):
-    pn = models.PhieuNhap(**data.dict())
+    pn = models.PhieuNhap(**data.model_dump())
     db.add(pn)
     db.commit()
     db.refresh(pn)
@@ -15,7 +15,7 @@ def tao_phieu_nhap(data: schemas.PhieuNhapBase, db: Session = Depends(get_db)):
 
 @router.post("/nhap/ct", response_model=schemas.CTPhieuNhapOut)
 def ct_phieu_nhap(data: schemas.CTPhieuNhapBase, db: Session = Depends(get_db)):
-    ct = models.CT_PhieuNhap(**data.dict())
+    ct = models.CT_PhieuNhap(**data.model_dump())
     db.add(ct)
     db.commit()
     db.refresh(ct)
@@ -23,7 +23,7 @@ def ct_phieu_nhap(data: schemas.CTPhieuNhapBase, db: Session = Depends(get_db)):
 
 @router.post("/xuat", response_model=schemas.PhieuXuatOut)
 def tao_phieu_xuat(data: schemas.PhieuXuatBase, db: Session = Depends(get_db)):
-    px = models.PhieuXuat(**data.dict())
+    px = models.PhieuXuat(**data.model_dump())
     db.add(px)
     db.commit()
     db.refresh(px)
@@ -31,7 +31,7 @@ def tao_phieu_xuat(data: schemas.PhieuXuatBase, db: Session = Depends(get_db)):
 
 @router.post("/xuat/ct", response_model=schemas.CTPhieuXuatOut)
 def ct_phieu_xuat(data: schemas.CTPhieuXuatBase, db: Session = Depends(get_db)):
-    ct = models.CT_PhieuXuat(**data.dict())
+    ct = models.CT_PhieuXuat(**data.model_dump())
     db.add(ct)
     db.commit()
     db.refresh(ct)

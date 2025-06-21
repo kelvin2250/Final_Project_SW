@@ -45,7 +45,7 @@ def update_phieuxuat_byId(id: int, payload: schemas.PhieuXuatUpdate, db: Session
     if not px:
         raise HTTPException(status_code=404, detail="Không tìm thấy phiếu xuất")
 
-    for field, value in payload.dict(exclude_unset=True).items():
+    for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(px, field, value)
 
     db.commit()

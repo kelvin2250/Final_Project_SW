@@ -78,7 +78,7 @@ class DVDT(Base):
     DonGia = Column(Integer, nullable=True)
     MoTa = Column(Text, nullable=True)
     MaNhomDVDT = Column(Integer, ForeignKey("NHOMDVDT.MaNhomDVDT"))
-    NgayTao = Column(DateTime, default=datetime.utcnow)
+    NgayTao = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 class PhieuKham(Base):
     __tablename__ = "PHIEUKHAM"
@@ -114,7 +114,7 @@ class PhieuNhap(Base):
     NgayNhap = Column(Date, nullable=True)
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
-    NgayTao = Column(DateTime, default=datetime.utcnow)
+    NgayTao = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 class CT_PhieuNhap(Base):
     __tablename__ = "CT_PHIEUNHAP"
@@ -132,7 +132,7 @@ class PhieuXuat(Base):
     NgayXuat = Column(Date, nullable=True)
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
-    NgayTao = Column(DateTime, default=datetime.utcnow)
+    NgayTao = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 class CT_PhieuXuat(Base):
     __tablename__ = "CT_PHIEUXUAT"
@@ -154,7 +154,7 @@ class HoaDon(Base):
     TrangThai = Column(String(50), default='Đã thanh toán')
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
-    NgayTao = Column(DateTime, default=datetime.utcnow)
+    NgayTao = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     DaXoa = Column(Boolean, default=False) 
     thuocs = relationship("CT_HoaDonThuoc", backref="hoadon")
     dichvus = relationship("CT_HoaDonDVDT", backref="hoadon")
@@ -189,7 +189,7 @@ class BaoCao(Base):
     ThoiGianBaoCao = Column(Date, nullable=True)
     NguoiLap = Column(String(100), nullable=True)
     GhiChu = Column(Text, nullable=True)
-    NgayTao = Column(DateTime, default=datetime.utcnow)
+    NgayTao = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 class CT_BaoCao(Base):
     __tablename__ = "CT_BAOCAO"

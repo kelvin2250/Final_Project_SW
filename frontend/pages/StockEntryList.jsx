@@ -11,7 +11,7 @@ export default function StockEntriesPage() {
     const loadPhieuXuat = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:8001/api/phieuxuat/');
+            const response = await fetch('http://localhost:8000/api/phieuxuat/');
             if (!response.ok) throw new Error('Failed to fetch');
             const data = await response.json();
             setPhieuXuatList(data);
@@ -32,7 +32,7 @@ export default function StockEntriesPage() {
         if (!confirm('Bạn có chắc chắn muốn xóa phiếu xuất này?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8001/api/phieuxuat/${id}`, {
+            const response = await fetch(`http://localhost:8000/api/phieuxuat/${id}`, {
                 method: 'DELETE',
             });
 
