@@ -24,7 +24,7 @@ export default function PrescriptionDetail({ data }) {
             })
             .catch((err) => console.error("Lỗi khi load thuốc:", err));
     }, [MaPhieuKham]);
-    
+
 
     const totalQuantity = medicines.reduce(
         (sum, med) => sum + (med.SoLuong || 0),

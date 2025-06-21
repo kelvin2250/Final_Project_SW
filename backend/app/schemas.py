@@ -38,8 +38,13 @@ class BenhNhanBase(BaseModel):
     HuyetAp: Optional[str] = None
     TienSu: Optional[str] = None
     NgayTao: Optional[datetime] = None  # dùng datetime vì DB đang để datetime
+<<<<<<< HEAD
 
 
+=======
+    
+    
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
 class BenhNhanCreate(BenhNhanBase):
     pass
 class BenhNhanOut(BenhNhanBase):
@@ -80,9 +85,15 @@ class ThuocBase(BaseModel):
     GiaBan: Optional[float]= None
     TonKho: Optional[int]= None
     CachDung: Optional[str] = None
+<<<<<<< HEAD
     SoDangKy: Optional[str]= None
     MaNhomThuoc: Optional[int]
     DaXoa: Optional[bool] = False
+=======
+    SoDangKy: Optional[str]= None   
+    MaNhomThuoc: Optional[int]
+    DaXoa: Optional[bool] = False 
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
 class ThuocCreate(ThuocBase):
     pass
 class ThuocOut(ThuocBase):
@@ -155,7 +166,11 @@ class PhieuKhamCreate(PhieuKhamBase):
 
 class PhieuKhamOut(PhieuKhamBase):
     MaPhieuKham: int
+<<<<<<< HEAD
     benhnhan: Optional[BenhNhanOut]
+=======
+    benhnhan: Optional[BenhNhanOut]  
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
     class Config:
         orm_mode = True
 
@@ -166,6 +181,7 @@ class PhieuNhapBase(BaseModel):
     NgayNhap: Optional[date]
     NguoiLap: Optional[str]
     GhiChu: Optional[str]
+<<<<<<< HEAD
 
 class PhieuNhapCreate(PhieuNhapBase):
     chi_tiet: Optional[list['CTPhieuNhapCreate']] = None
@@ -173,6 +189,8 @@ class PhieuNhapCreate(PhieuNhapBase):
 class PhieuNhapUpdate(PhieuNhapBase):
     pass
 
+=======
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
 class PhieuNhapOut(PhieuNhapBase):
     MaPhieuNhap: int
     NgayTao: datetime
@@ -180,11 +198,16 @@ class PhieuNhapOut(PhieuNhapBase):
         orm_mode = True
 
 class CTPhieuNhapBase(BaseModel):
+<<<<<<< HEAD
+=======
+    MaPhieuNhap: int
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
     MaThuoc: int
     SoLuongNhap: Optional[int]
     GiaNhap: Optional[float]
     GiaBan: Optional[float]
     HanSuDung: Optional[date]
+<<<<<<< HEAD
 
 class CTPhieuNhapCreate(CTPhieuNhapBase):
     pass
@@ -192,6 +215,10 @@ class CTPhieuNhapCreate(CTPhieuNhapBase):
 class CTPhieuNhapOut(CTPhieuNhapBase):
     MaCTPhieuNhap: int
     MaPhieuNhap: int
+=======
+class CTPhieuNhapOut(CTPhieuNhapBase):
+    MaCTPhieuNhap: int
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
     class Config:
         orm_mode = True
 
@@ -199,6 +226,7 @@ class PhieuXuatBase(BaseModel):
     NgayXuat: Optional[date]
     NguoiLap: Optional[str]
     GhiChu: Optional[str]
+<<<<<<< HEAD
 
 class PhieuXuatCreate(PhieuXuatBase):
     chi_tiet: Optional[list['CTPhieuXuatCreate']] = None
@@ -206,6 +234,8 @@ class PhieuXuatCreate(PhieuXuatBase):
 class PhieuXuatUpdate(PhieuXuatBase):
     pass
 
+=======
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
 class PhieuXuatOut(PhieuXuatBase):
     MaPhieuXuat: int
     NgayTao: datetime
@@ -213,6 +243,7 @@ class PhieuXuatOut(PhieuXuatBase):
         orm_mode = True
 
 class CTPhieuXuatBase(BaseModel):
+<<<<<<< HEAD
     MaThuoc: int
     SoLuongXuat: Optional[int]
     GiaBan: Optional[float]
@@ -223,6 +254,14 @@ class CTPhieuXuatCreate(CTPhieuXuatBase):
 class CTPhieuXuatOut(CTPhieuXuatBase):
     MaCTPhieuXuat: int
     MaPhieuXuat: int
+=======
+    MaPhieuXuat: int
+    MaThuoc: int
+    SoLuongXuat: Optional[int]
+    GiaBan: Optional[float]
+class CTPhieuXuatOut(CTPhieuXuatBase):
+    MaCTPhieuXuat: int
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
     class Config:
         orm_mode = True
 class HoaDonBase(BaseModel):
@@ -278,6 +317,7 @@ class BaoCaoBase(BaseModel):
     ThoiGianBaoCao: Optional[date]
     NguoiLap: Optional[str]
     GhiChu: Optional[str]
+<<<<<<< HEAD
 
 class BaoCaoCreate(BaoCaoBase):
     pass
@@ -285,6 +325,8 @@ class BaoCaoCreate(BaoCaoBase):
 class BaoCaoUpdate(BaoCaoBase):
     pass
 
+=======
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
 class BaoCaoOut(BaoCaoBase):
     MaBaoCao: int
     NgayTao: datetime
@@ -298,10 +340,13 @@ class CTBaoCaoBase(BaseModel):
     TongTienThuoc: Optional[float]
     TongTienDichVu: Optional[float]
     TongDoanhThu: Optional[float]
+<<<<<<< HEAD
 
 class CTBaoCaoCreate(CTBaoCaoBase):
     pass
 
+=======
+>>>>>>> 0824ee06917a38fbe8e1eaa30a6d29de0cfc6db7
 class CTBaoCaoOut(CTBaoCaoBase):
     MaCTBaoCao: int
     class Config:
