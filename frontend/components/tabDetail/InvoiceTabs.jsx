@@ -28,6 +28,7 @@ export default function InvoiceTabs({ invoice, patient }) {
                     <div className="mb-2 text-sm">
                         <p><strong>Ngày lập:</strong> {new Date(invoice.NgayLap).toLocaleDateString("vi-VN")}</p>
                         <p><strong>Người lập:</strong> {invoice.NguoiLap}</p>
+                        <p><strong>Trạng thái:</strong> {invoice.TrangThai}</p>
                         <p><strong>Ghi chú:</strong> {invoice.GhiChu || "Không có"}</p>
                     </div>
                     <InvoiceDetail data={invoice} />
